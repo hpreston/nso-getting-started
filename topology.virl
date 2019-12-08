@@ -82,7 +82,6 @@
     control-plane
     !
     ip route vrf Mgmt-intf 0.0.0.0 0.0.0.0 {{ gateway }}
-    !
     ip domain-name lab.intra
     crypto key generate rsa general-keys modulus 1024    
     end
@@ -1384,7 +1383,6 @@ line vty
     control-plane
     !
     ip route vrf Mgmt-intf 0.0.0.0 0.0.0.0 {{ gateway }}
-    !
     ip domain-name lab.intra
     crypto key generate rsa general-keys modulus 1024    
     end
@@ -1397,7 +1395,7 @@ line vty
         <interface id="4" name="GigabitEthernet1/1"/>
         <interface id="5" name="GigabitEthernet1/2"/>
     </node>
-    <node name="dev-web01" type="SIMPLE" subtype="server" location="214,865">
+    <node name="dev-web01" type="SIMPLE" subtype="server" location="207,1193">
         <extensions>
             <entry key="AutoNetkit.ASN" type="Integer">1</entry>
             <entry key="static_ip" type="String">172.16.30.161</entry>
@@ -1448,7 +1446,7 @@ line vty
         </extensions>
         <interface id="0" name="eth1"/>
     </node>
-    <node name="prod-data01" type="SIMPLE" subtype="server" location="127,865">
+    <node name="prod-data01" type="SIMPLE" subtype="server" location="290,1119">
         <extensions>
             <entry key="AutoNetkit.ASN" type="Integer">1</entry>
             <entry key="static_ip" type="String">172.16.30.162</entry>
@@ -1499,7 +1497,7 @@ line vty
         </extensions>
         <interface id="0" name="eth1"/>
     </node>
-    <node name="admin-systems01" type="SIMPLE" subtype="server" location="713,869">
+    <node name="admin-systems01" type="SIMPLE" subtype="server" location="448,1028">
         <extensions>
             <entry key="AutoNetkit.ASN" type="Integer">1</entry>
             <entry key="static_ip" type="String">172.16.30.151</entry>
@@ -1549,7 +1547,7 @@ line vty
         </extensions>
         <interface id="0" name="eth1"/>
     </node>
-    <node name="prod-web01" type="SIMPLE" subtype="server" location="792,932">
+    <node name="prod-web01" type="SIMPLE" subtype="server" location="416,1125">
         <extensions>
             <entry key="AutoNetkit.ASN" type="Integer">1</entry>
             <entry key="static_ip" type="String">172.16.30.152</entry>
@@ -1758,7 +1756,7 @@ line vty
         </extensions>
         <interface id="0" name="eth1"/>
     </node>
-    <node name="dev-data01" type="SIMPLE" subtype="server" location="558,1053">
+    <node name="dev-data01" type="SIMPLE" subtype="server" location="734,1200">
         <extensions>
             <entry key="static_ip" type="String">172.16.30.153</entry>
             <entry key="config" type="String">#cloud-config
@@ -1808,7 +1806,7 @@ line vty
         </extensions>
         <interface id="0" name="eth1"/>
     </node>
-    <node name="dev-app01" type="SIMPLE" subtype="server" location="659,1059">
+    <node name="dev-app01" type="SIMPLE" subtype="server" location="621,1206">
         <extensions>
             <entry key="static_ip" type="String">172.16.30.154</entry>
             <entry key="config" type="String">#cloud-config
@@ -1858,7 +1856,7 @@ line vty
         </extensions>
         <interface id="0" name="eth1"/>
     </node>
-    <node name="prod-app01" type="SIMPLE" subtype="server" location="789,1051">
+    <node name="prod-app01" type="SIMPLE" subtype="server" location="550,1122">
         <extensions>
             <entry key="static_ip" type="String">172.16.30.155</entry>
             <entry key="config" type="String">#cloud-config
@@ -1908,7 +1906,7 @@ line vty
         </extensions>
         <interface id="0" name="eth1"/>
     </node>
-    <node name="guest-01" type="SIMPLE" subtype="server" location="63,924">
+    <node name="guest-01" type="SIMPLE" subtype="server" location="96,1255">
         <extensions>
             <entry key="static_ip" type="String">172.16.30.164</entry>
             <entry key="config" type="String">#cloud-config
@@ -1958,7 +1956,7 @@ line vty
         </extensions>
         <interface id="0" name="eth1"/>
     </node>
-    <node name="admin-mgmt01" type="SIMPLE" subtype="server" location="105,1042">
+    <node name="admin-mgmt01" type="SIMPLE" subtype="server" location="345,1030">
         <extensions>
             <entry key="static_ip" type="String">172.16.30.167</entry>
             <entry key="config" type="String">#cloud-config
@@ -2086,7 +2084,6 @@ line vty
     control-plane
     !
     ip route vrf Mgmt-intf 0.0.0.0 0.0.0.0 {{ gateway }}
-    !
     ip domain-name lab.intra
     crypto key generate rsa general-keys modulus 1024    
     end
@@ -2176,9 +2173,8 @@ line vty
   control-plane
   !
   ip route vrf Mgmt-intf 0.0.0.0 0.0.0.0 {{ gateway }}
-    !
-    ip domain-name lab.intra
-    crypto key generate rsa general-keys modulus 1024    
+  ip domain-name lab.intra
+  crypto key generate rsa general-keys modulus 1024    
   end
           </entry>
         </extensions>
@@ -2590,7 +2586,6 @@ call-home
     <node name="internet-server02" type="SIMPLE" subtype="server" location="900,91">
         <extensions>
             <entry key="AutoNetkit.ASN" type="Integer">1</entry>
-            <entry key="static_ip" type="String">172.16.30.176</entry>
             <entry key="config" type="String">#cloud-config
   bootcmd:
   - ln -s -t /etc/rc.d /etc/rc.local
@@ -2636,6 +2631,7 @@ call-home
       apt install -y openconnect
       exit 0
           </entry>
+            <entry key="static_ip" type="String">172.16.30.176</entry>
         </extensions>
         <interface id="0" name="eth1"/>
     </node>
