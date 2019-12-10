@@ -95,7 +95,7 @@
         <interface id="5" name="GigabitEthernet1/2"/>
         <interface id="6" name="GigabitEthernet1/3"/>
     </node>
-    <node name="dmz-fw01-1-asa" type="SIMPLE" subtype="ASAv" location="672,89">
+    <node name="dmz-fw01-1" type="SIMPLE" subtype="ASAv" location="672,89">
         <extensions>
             <entry key="static_ip" type="String">172.16.30.133</entry>
             <entry key="config" type="string">!
@@ -1948,9 +1948,9 @@ line vty
     permissions: '0755'
     content: |-
       #!/bin/sh
-      ifconfig eth1 up 10.225.233.11 netmask 255.255.255.0
-      route add -net 10.225.0.0/16 gw 10.225.233.1 dev eth1
-      route add -net 192.168.255.0/24 gw 10.225.233.1 dev eth1
+      ifconfig eth1 up 10.225.49.11 netmask 255.255.255.0
+      route add -net 10.225.0.0/16 gw 10.225.49.1 dev eth1
+      route add -net 192.168.255.0/24 gw 10.225.49.1 dev eth1
       exit 0
           </entry>
         </extensions>
@@ -2389,7 +2389,7 @@ call-home
             <entry key="static_ip" type="String">172.16.30.145</entry>
             <entry key="config">!
 !
-hostname pod-fw01
+hostname fw01
 terminal width 0
 username cisco password cisco privilege 15
 enable password cisco
