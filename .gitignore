@@ -1,3 +1,21 @@
+# NSO
+logs/
+ncs-cdb/
+packages/
+scripts/
+state/
+test/
+ncs.conf
+README.ncs
+cisco-asa*
+cisco-nx*
+cisco-ios*
+cisco-ucs*
+storedstate
+
+netsim/
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
