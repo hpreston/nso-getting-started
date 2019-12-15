@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<?xml version='1.0' encoding='UTF-8' standalone='yes'?>
 <topology xmlns="http://www.cisco.com/VIRL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" schemaVersion="0.95" xsi:schemaLocation="http://www.cisco.com/VIRL https://raw.github.com/CiscoVIRL/schema/v0.95/virl.xsd">
     <extensions>
         <entry key="management_network" type="String">flat</entry>
@@ -81,7 +81,7 @@
     !
     control-plane
     !
-    ip route vrf Mgmt-intf 0.0.0.0 0.0.0.0 {{ gateway }}
+    ip route vrf Mgmt-intf 0.0.0.0 0.0.0.0 172.16.30.254
     ip domain-name lab.intra
     crypto key generate rsa general-keys modulus 1024    
     end
@@ -118,7 +118,7 @@ no ip address
 access-list global_access line 1 remark Allow Ping
   access-list global_access line 2 extended permit icmp any any
 access-group global_access global
-route mgmt 0.0.0.0 0.0.0.0 {{ gateway }}
+route mgmt 0.0.0.0 0.0.0.0 172.16.30.254
 !
 aaa authentication ssh console LOCAL
 aaa authentication telnet console LOCAL
@@ -134,7 +134,7 @@ http 0.0.0.0 0.0.0.0 outside-1
 ssh 0.0.0.0 0.0.0.0 outside-1
 telnet 0.0.0.0 0.0.0.0 outside-1
 ssh version 2
-crypto key generate rsa modulus 768
+crypto key generate rsa modulus 1024
 telnet timeout 15
 console timeout 0
 
@@ -427,7 +427,7 @@ interface GigabitEthernet1
   speed auto
   no shutdown
 !
-ip route vrf Mgmt-intf 0.0.0.0 0.0.0.0 {{ gateway }}
+ip route vrf Mgmt-intf 0.0.0.0 0.0.0.0 172.16.30.254
 !
 !
 interface GigabitEthernet2
@@ -605,7 +605,7 @@ interface GigabitEthernet1
   speed auto
   no shutdown
 !
-ip route vrf Mgmt-intf 0.0.0.0 0.0.0.0 {{ gateway }}
+ip route vrf Mgmt-intf 0.0.0.0 0.0.0.0 172.16.30.254
 !
 interface GigabitEthernet2
  negotiation auto
@@ -697,7 +697,7 @@ no ip domain-lookup
 vlan 1
 
 vrf context management
-  ip route 0.0.0.0/0 {{ gateway }}
+  ip route 0.0.0.0/0 172.16.30.254
 
 hardware forwarding unicast trace
 
@@ -732,47 +732,355 @@ line vty
             <entry key="AutoNetkit.ASN" type="Integer">1</entry>
             <entry key="static_ip" type="String">172.16.30.108</entry>
             <entry key="config">!Command: show running-config
-              !
-    hostname dmz-sw01-2
-    vdc nx id 1
-      limit-resource vlan minimum 16 maximum 4094
-      limit-resource vrf minimum 2 maximum 4096
-      limit-resource port-channel minimum 0 maximum 768
-      limit-resource u4route-mem minimum 96 maximum 96
-      limit-resource u6route-mem minimum 24 maximum 24
-      limit-resource m4route-mem minimum 58 maximum 58
-      limit-resource m6route-mem minimum 8 maximum 8
+!Running configuration last done at: Sun Dec 15 17:20:53 2019
+!Time: Sun Dec 15 17:44:54 2019
 
-    feature telnet
-    feature ssh
+version 9.2(2) Bios:version  
+hostname dmz-sw01-2
+vdc dmz-sw01-2 id 1
+  limit-resource vlan minimum 16 maximum 4094
+  limit-resource vrf minimum 2 maximum 4096
+  limit-resource port-channel minimum 0 maximum 511
+  limit-resource u4route-mem minimum 128 maximum 128
+  limit-resource u6route-mem minimum 96 maximum 96
+  limit-resource m4route-mem minimum 58 maximum 58
+  limit-resource m6route-mem minimum 8 maximum 8
 
-    no password strength-check
-    username admin password 5 $1$KuOSBsvW$Cy0TSD..gEBGBPjzpDgf51 role network-admin
-username cisco password 5 $1$Nk7ZkwH0$fyiRmMMfIheqE3BqvcL0C1 role network-operator
+feature telnet
+cfs eth distribute
+feature lacp
+feature vpc
+
+no password strength-check
+username admin password 5 $1$KuOSBsvW$Cy0TSD..gEBGBPjzpDgf51  role network-admin
+username cisco password 5 $1$Nk7ZkwH0$fyiRmMMfIheqE3BqvcL0C1  role network-operator
 username cisco role network-admin
-    no ip domain-lookup
+no ip domain-lookup
+rmon event 1 description FATAL(1) owner PMON@FATAL
+rmon event 2 description CRITICAL(2) owner PMON@CRITICAL
+rmon event 3 description ERROR(3) owner PMON@ERROR
+rmon event 4 description WARNING(4) owner PMON@WARNING
+rmon event 5 description INFORMATION(5) owner PMON@INFO
+
+vlan 1,10
+vlan 10
+  name outside-dmz-rtr02
+
+vrf context management
+  ip route 0.0.0.0/0 172.16.30.254
+hardware forwarding unicast trace
+vpc domain 10
+  peer-switch
+  peer-keepalive destination 172.16.30.107 source 172.16.30.108
+  peer-gateway
 
 
-    vlan 1
+interface port-channel1
+  switchport mode trunk
+  spanning-tree port type network
+  vpc peer-link
 
-    vrf context management
-      ip route 0.0.0.0/0 {{ gateway }}
+interface port-channel11
+  description to dmz-rtr02-1
+  switchport mode trunk
+  switchport trunk allowed vlan 10
+  mtu 9216
+  vpc 11
 
-    hardware forwarding unicast trace
+interface port-channel12
+  description to dmz-rtr02-2
+  switchport mode trunk
+  switchport trunk allowed vlan 10
+  mtu 9216
+  vpc 12
 
-    interface mgmt0
-      description OOB Management
-      ! Configured on launch
-      no ip address
-      no shutdown
-      vrf member management
+interface Ethernet1/1
+  description VPC Peer Link
+  switchport mode trunk
+  channel-group 1 mode active
+
+interface Ethernet1/2
+  description VPC Peer Link
+  switchport mode trunk
+  channel-group 1 mode active
+
+interface Ethernet1/3
+
+interface Ethernet1/4
+
+interface Ethernet1/5
+  description inside dmz-fw01-1
+  switchport mode trunk
+  switchport trunk allowed vlan 10
+  mtu 9216
+
+interface Ethernet1/6
+
+interface Ethernet1/7
+  description to dmz-rtr02-1
+  switchport mode trunk
+  switchport trunk allowed vlan 10
+  mtu 9216
+  channel-group 11 mode active
+
+interface Ethernet1/8
+  description to dmz-rtr02-2
+  switchport mode trunk
+  switchport trunk allowed vlan 10
+  mtu 9216
+  channel-group 12 mode active
+
+interface Ethernet1/9
+
+interface Ethernet1/10
+
+interface Ethernet1/11
+
+interface Ethernet1/12
+
+interface Ethernet1/13
+
+interface Ethernet1/14
+
+interface Ethernet1/15
+
+interface Ethernet1/16
+
+interface Ethernet1/17
+
+interface Ethernet1/18
+
+interface Ethernet1/19
+
+interface Ethernet1/20
+
+interface Ethernet1/21
+
+interface Ethernet1/22
+
+interface Ethernet1/23
+
+interface Ethernet1/24
+
+interface Ethernet1/25
+
+interface Ethernet1/26
+
+interface Ethernet1/27
+
+interface Ethernet1/28
+
+interface Ethernet1/29
+
+interface Ethernet1/30
+
+interface Ethernet1/31
+
+interface Ethernet1/32
+
+interface Ethernet1/33
+
+interface Ethernet1/34
+
+interface Ethernet1/35
+
+interface Ethernet1/36
+
+interface Ethernet1/37
+
+interface Ethernet1/38
+
+interface Ethernet1/39
+
+interface Ethernet1/40
+
+interface Ethernet1/41
+
+interface Ethernet1/42
+
+interface Ethernet1/43
+
+interface Ethernet1/44
+
+interface Ethernet1/45
+
+interface Ethernet1/46
+
+interface Ethernet1/47
+
+interface Ethernet1/48
+
+interface Ethernet1/49
+
+interface Ethernet1/50
+
+interface Ethernet1/51
+
+interface Ethernet1/52
+
+interface Ethernet1/53
+
+interface Ethernet1/54
+
+interface Ethernet1/55
+
+interface Ethernet1/56
+
+interface Ethernet1/57
+
+interface Ethernet1/58
+
+interface Ethernet1/59
+
+interface Ethernet1/60
+
+interface Ethernet1/61
+
+interface Ethernet1/62
+
+interface Ethernet1/63
+
+interface Ethernet1/64
+
+interface Ethernet1/65
+
+interface Ethernet1/66
+
+interface Ethernet1/67
+
+interface Ethernet1/68
+
+interface Ethernet1/69
+
+interface Ethernet1/70
+
+interface Ethernet1/71
+
+interface Ethernet1/72
+
+interface Ethernet1/73
+
+interface Ethernet1/74
+
+interface Ethernet1/75
+
+interface Ethernet1/76
+
+interface Ethernet1/77
+
+interface Ethernet1/78
+
+interface Ethernet1/79
+
+interface Ethernet1/80
+
+interface Ethernet1/81
+
+interface Ethernet1/82
+
+interface Ethernet1/83
+
+interface Ethernet1/84
+
+interface Ethernet1/85
+
+interface Ethernet1/86
+
+interface Ethernet1/87
+
+interface Ethernet1/88
+
+interface Ethernet1/89
+
+interface Ethernet1/90
+
+interface Ethernet1/91
+
+interface Ethernet1/92
+
+interface Ethernet1/93
+
+interface Ethernet1/94
+
+interface Ethernet1/95
+
+interface Ethernet1/96
+
+interface Ethernet1/97
+
+interface Ethernet1/98
+
+interface Ethernet1/99
+
+interface Ethernet1/100
+
+interface Ethernet1/101
+
+interface Ethernet1/102
+
+interface Ethernet1/103
+
+interface Ethernet1/104
+
+interface Ethernet1/105
+
+interface Ethernet1/106
+
+interface Ethernet1/107
+
+interface Ethernet1/108
+
+interface Ethernet1/109
+
+interface Ethernet1/110
+
+interface Ethernet1/111
+
+interface Ethernet1/112
+
+interface Ethernet1/113
+
+interface Ethernet1/114
+
+interface Ethernet1/115
+
+interface Ethernet1/116
+
+interface Ethernet1/117
+
+interface Ethernet1/118
+
+interface Ethernet1/119
+
+interface Ethernet1/120
+
+interface Ethernet1/121
+
+interface Ethernet1/122
+
+interface Ethernet1/123
+
+interface Ethernet1/124
+
+interface Ethernet1/125
+
+interface Ethernet1/126
+
+interface Ethernet1/127
+
+interface Ethernet1/128
+
+interface mgmt0
+  description OOB Management
+  vrf member management
+  ip address 172.16.30.108/24
+line console
+line vty
+no feature signature-verification
 
 
-    line console
-    line vty
 
-
-    </entry>
+</entry>
         </extensions>
         <interface id="0" name="Ethernet1/1"/>
         <interface id="1" name="Ethernet1/2"/>
@@ -815,7 +1123,7 @@ username cisco role network-admin
     vlan 1
 
     vrf context management
-      ip route 0.0.0.0/0 {{ gateway }}
+      ip route 0.0.0.0/0 172.16.30.254
 
     hardware forwarding unicast trace
 
@@ -874,7 +1182,7 @@ no ip domain-lookup
 vlan 1
 
 vrf context management
-  ip route 0.0.0.0/0 {{ gateway }}
+  ip route 0.0.0.0/0 172.16.30.254
 
 hardware forwarding unicast trace
 
@@ -1018,7 +1326,7 @@ interface GigabitEthernet1
   speed auto
   no shutdown
 !
-ip route vrf Mgmt-intf 0.0.0.0 0.0.0.0 {{ gateway }}
+ip route vrf Mgmt-intf 0.0.0.0 0.0.0.0 172.16.30.254
 !
 interface GigabitEthernet2
  negotiation auto
@@ -1105,7 +1413,7 @@ no ip domain-lookup
 vlan 1
 
 vrf context management
-  ip route 0.0.0.0/0 {{ gateway }}
+  ip route 0.0.0.0/0 172.16.30.254
 
 hardware forwarding unicast trace
 
@@ -1166,7 +1474,7 @@ no ip domain-lookup
 vlan 1
 
 vrf context management
-  ip route 0.0.0.0/0 {{ gateway }}
+  ip route 0.0.0.0/0 172.16.30.254
 
 hardware forwarding unicast trace
 
@@ -1226,7 +1534,7 @@ no ip domain-lookup
 vlan 1
 
 vrf context management
-  ip route 0.0.0.0/0 {{ gateway }}
+  ip route 0.0.0.0/0 172.16.30.254
 
 hardware forwarding unicast trace
 
@@ -1281,7 +1589,7 @@ no ip domain-lookup
 vlan 1
 
 vrf context management
-  ip route 0.0.0.0/0 {{ gateway }}
+  ip route 0.0.0.0/0 172.16.30.254
 
 hardware forwarding unicast trace
 
@@ -1382,7 +1690,7 @@ line vty
     !
     control-plane
     !
-    ip route vrf Mgmt-intf 0.0.0.0 0.0.0.0 {{ gateway }}
+    ip route vrf Mgmt-intf 0.0.0.0 0.0.0.0 172.16.30.254
     ip domain-name lab.intra
     crypto key generate rsa general-keys modulus 1024    
     end
@@ -1602,45 +1910,377 @@ line vty
         <extensions>
             <entry key="AutoNetkit.ASN" type="Integer">1</entry>
             <entry key="static_ip" type="String">172.16.30.101</entry>
-            <entry key="config">!
-!
+            <entry key="config">!Command: show running-config
+!Running configuration last done at: Sun Dec 15 17:20:51 2019
+!Time: Sun Dec 15 17:44:54 2019
+
+version 9.2(2) Bios:version  
 hostname spine01-1
-vdc nx id 1
+vdc spine01-1 id 1
   limit-resource vlan minimum 16 maximum 4094
   limit-resource vrf minimum 2 maximum 4096
-  limit-resource port-channel minimum 0 maximum 768
-  limit-resource u4route-mem minimum 96 maximum 96
-  limit-resource u6route-mem minimum 24 maximum 24
+  limit-resource port-channel minimum 0 maximum 511
+  limit-resource u4route-mem minimum 128 maximum 128
+  limit-resource u6route-mem minimum 96 maximum 96
   limit-resource m4route-mem minimum 58 maximum 58
   limit-resource m6route-mem minimum 8 maximum 8
 
 feature telnet
-feature ssh
+cfs eth distribute
+feature lacp
+feature vpc
 
 no password strength-check
-username admin password 5 $1$KuOSBsvW$Cy0TSD..gEBGBPjzpDgf51 role network-admin
-username cisco password 5 $1$Nk7ZkwH0$fyiRmMMfIheqE3BqvcL0C1 role network-operator
+username admin password 5 $1$KuOSBsvW$Cy0TSD..gEBGBPjzpDgf51  role network-admin
+username cisco password 5 $1$Nk7ZkwH0$fyiRmMMfIheqE3BqvcL0C1  role network-operator
 username cisco role network-admin
 no ip domain-lookup
+rmon event 1 description FATAL(1) owner PMON@FATAL
+rmon event 2 description CRITICAL(2) owner PMON@CRITICAL
+rmon event 3 description ERROR(3) owner PMON@ERROR
+rmon event 4 description WARNING(4) owner PMON@WARNING
+rmon event 5 description INFORMATION(5) owner PMON@INFO
 
-
-vlan 1
+vlan 1,10-12,100-103,201-203,900-901,3001
+vlan 10
+  name trusted-transit
+vlan 11
+  name admin-systems
+vlan 12
+  name mgmt
+vlan 100
+  name dmz-transit
+vlan 101
+  name prod-web
+vlan 102
+  name prod-app
+vlan 103
+  name prod-data
+vlan 201
+  name dev-web
+vlan 202
+  name dev-app
+vlan 203
+  name dev-data
+vlan 900
+  name guest-transit
+vlan 901
+  name hotspot
+vlan 3001
+  name backdoor-temp
 
 vrf context management
-  ip route 0.0.0.0/0 {{ gateway }}
-
+  ip route 0.0.0.0/0 172.16.30.254
 hardware forwarding unicast trace
+vpc domain 12
+  peer-switch
+  peer-keepalive destination 172.16.30.102 source 172.16.30.101
+  peer-gateway
+
+
+interface port-channel1
+  switchport mode trunk
+  spanning-tree port type network
+  vpc peer-link
+
+interface port-channel11
+  description Interswitch Fabric Link
+  switchport mode trunk
+  mtu 9216
+  vpc 11
+
+interface port-channel12
+  description Interswitch Fabric Link
+  switchport mode trunk
+  mtu 9216
+  vpc 12
+
+interface Ethernet1/1
+  description VPC Peer Link
+  switchport mode trunk
+  channel-group 1 mode active
+
+interface Ethernet1/2
+  description VPC Peer Link
+  switchport mode trunk
+  channel-group 1 mode active
+
+interface Ethernet1/3
+  description Interswitch Fabric Link
+  switchport mode trunk
+  mtu 9216
+  channel-group 11 mode active
+
+interface Ethernet1/4
+  description Interswitch Fabric Link
+  switchport mode trunk
+  mtu 9216
+  channel-group 11 mode active
+
+interface Ethernet1/5
+  description Interswitch Fabric Link
+  switchport mode trunk
+  mtu 9216
+  channel-group 12 mode active
+
+interface Ethernet1/6
+  description Interswitch Fabric Link
+  switchport mode trunk
+  mtu 9216
+  channel-group 12 mode active
+
+interface Ethernet1/7
+
+interface Ethernet1/8
+
+interface Ethernet1/9
+
+interface Ethernet1/10
+
+interface Ethernet1/11
+
+interface Ethernet1/12
+
+interface Ethernet1/13
+
+interface Ethernet1/14
+
+interface Ethernet1/15
+
+interface Ethernet1/16
+
+interface Ethernet1/17
+
+interface Ethernet1/18
+
+interface Ethernet1/19
+
+interface Ethernet1/20
+
+interface Ethernet1/21
+
+interface Ethernet1/22
+
+interface Ethernet1/23
+
+interface Ethernet1/24
+
+interface Ethernet1/25
+
+interface Ethernet1/26
+
+interface Ethernet1/27
+
+interface Ethernet1/28
+
+interface Ethernet1/29
+
+interface Ethernet1/30
+
+interface Ethernet1/31
+
+interface Ethernet1/32
+
+interface Ethernet1/33
+
+interface Ethernet1/34
+
+interface Ethernet1/35
+
+interface Ethernet1/36
+
+interface Ethernet1/37
+
+interface Ethernet1/38
+
+interface Ethernet1/39
+
+interface Ethernet1/40
+
+interface Ethernet1/41
+
+interface Ethernet1/42
+
+interface Ethernet1/43
+
+interface Ethernet1/44
+
+interface Ethernet1/45
+
+interface Ethernet1/46
+
+interface Ethernet1/47
+
+interface Ethernet1/48
+
+interface Ethernet1/49
+
+interface Ethernet1/50
+
+interface Ethernet1/51
+
+interface Ethernet1/52
+
+interface Ethernet1/53
+
+interface Ethernet1/54
+
+interface Ethernet1/55
+
+interface Ethernet1/56
+
+interface Ethernet1/57
+
+interface Ethernet1/58
+
+interface Ethernet1/59
+
+interface Ethernet1/60
+
+interface Ethernet1/61
+
+interface Ethernet1/62
+
+interface Ethernet1/63
+
+interface Ethernet1/64
+
+interface Ethernet1/65
+
+interface Ethernet1/66
+
+interface Ethernet1/67
+
+interface Ethernet1/68
+
+interface Ethernet1/69
+
+interface Ethernet1/70
+
+interface Ethernet1/71
+
+interface Ethernet1/72
+
+interface Ethernet1/73
+
+interface Ethernet1/74
+
+interface Ethernet1/75
+
+interface Ethernet1/76
+
+interface Ethernet1/77
+
+interface Ethernet1/78
+
+interface Ethernet1/79
+
+interface Ethernet1/80
+
+interface Ethernet1/81
+
+interface Ethernet1/82
+
+interface Ethernet1/83
+
+interface Ethernet1/84
+
+interface Ethernet1/85
+
+interface Ethernet1/86
+
+interface Ethernet1/87
+
+interface Ethernet1/88
+
+interface Ethernet1/89
+
+interface Ethernet1/90
+
+interface Ethernet1/91
+
+interface Ethernet1/92
+
+interface Ethernet1/93
+
+interface Ethernet1/94
+
+interface Ethernet1/95
+
+interface Ethernet1/96
+
+interface Ethernet1/97
+
+interface Ethernet1/98
+
+interface Ethernet1/99
+
+interface Ethernet1/100
+
+interface Ethernet1/101
+
+interface Ethernet1/102
+
+interface Ethernet1/103
+
+interface Ethernet1/104
+
+interface Ethernet1/105
+
+interface Ethernet1/106
+
+interface Ethernet1/107
+
+interface Ethernet1/108
+
+interface Ethernet1/109
+
+interface Ethernet1/110
+
+interface Ethernet1/111
+
+interface Ethernet1/112
+
+interface Ethernet1/113
+
+interface Ethernet1/114
+
+interface Ethernet1/115
+
+interface Ethernet1/116
+
+interface Ethernet1/117
+
+interface Ethernet1/118
+
+interface Ethernet1/119
+
+interface Ethernet1/120
+
+interface Ethernet1/121
+
+interface Ethernet1/122
+
+interface Ethernet1/123
+
+interface Ethernet1/124
+
+interface Ethernet1/125
+
+interface Ethernet1/126
+
+interface Ethernet1/127
+
+interface Ethernet1/128
 
 interface mgmt0
   description OOB Management
-  ! Configured on launch
-  no ip address
-  no shutdown
   vrf member management
-
-
+  ip address 172.16.30.101/24
 line console
 line vty
+no feature signature-verification
+
 
 
 </entry>
@@ -1681,7 +2321,7 @@ no ip domain-lookup
 vlan 1
 
 vrf context management
-  ip route 0.0.0.0/0 {{ gateway }}
+  ip route 0.0.0.0/0 172.16.30.254
 
 hardware forwarding unicast trace
 
@@ -2083,7 +2723,7 @@ line vty
     !
     control-plane
     !
-    ip route vrf Mgmt-intf 0.0.0.0 0.0.0.0 {{ gateway }}
+    ip route vrf Mgmt-intf 0.0.0.0 0.0.0.0 172.16.30.254
     ip domain-name lab.intra
     crypto key generate rsa general-keys modulus 1024    
     end
@@ -2172,7 +2812,7 @@ line vty
   !
   control-plane
   !
-  ip route vrf Mgmt-intf 0.0.0.0 0.0.0.0 {{ gateway }}
+  ip route vrf Mgmt-intf 0.0.0.0 0.0.0.0 172.16.30.254
   ip domain-name lab.intra
   crypto key generate rsa general-keys modulus 1024    
   end
@@ -2207,7 +2847,7 @@ no ip address
 access-list global_access line 1 remark Allow Ping
   access-list global_access line 2 extended permit icmp any any
 access-group global_access global
-route mgmt 0.0.0.0 0.0.0.0 {{ gateway }}
+route mgmt 0.0.0.0 0.0.0.0 172.16.30.254
 !
 aaa authentication ssh console LOCAL
 aaa authentication telnet console LOCAL
@@ -2223,7 +2863,7 @@ http 0.0.0.0 0.0.0.0 outside-1
 ssh 0.0.0.0 0.0.0.0 outside-1
 telnet 0.0.0.0 0.0.0.0 outside-1
 ssh version 2
-crypto key generate rsa modulus 768
+crypto key generate rsa modulus 1024
 telnet timeout 15
 console timeout 0
 !
@@ -2407,7 +3047,7 @@ no ip address
 access-list global_access line 1 remark Allow Ping
   access-list global_access line 2 extended permit icmp any any
 access-group global_access global
-route mgmt 0.0.0.0 0.0.0.0 {{ gateway }}
+route mgmt 0.0.0.0 0.0.0.0 172.16.30.254
 !
 aaa authentication ssh console LOCAL
 aaa authentication telnet console LOCAL
@@ -2423,7 +3063,7 @@ http 0.0.0.0 0.0.0.0 outside-1
 ssh 0.0.0.0 0.0.0.0 outside-1
 telnet 0.0.0.0 0.0.0.0 outside-1
 ssh version 2
-crypto key generate rsa modulus 768
+crypto key generate rsa modulus 1024
 telnet timeout 15
 console timeout 0
 !
