@@ -172,7 +172,7 @@ With NSO running, we now need to add our devices into it's "inventory" so that i
 
     </details>
 
-    > This is a very handy way to see what configuraiton is ready to be commited before you finalize it.  Also, note that NSO uses a local encryption model to store the credentials in it's database.  
+    > This is a very handy way to see what configuration is ready to be committed before you finalize it.  Also, note that NSO uses a local encryption model to store the credentials in it's database.  
 
 1. Now `commit` this to lock in the changes.  
 
