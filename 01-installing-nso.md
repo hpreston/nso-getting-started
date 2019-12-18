@@ -6,7 +6,7 @@ Cisco makes NSO available for anyone to use and try in a non-production use comp
 
 ## Pre-requisites 
 ### Operating System 
-Cisco NSO can run on macOS or on Linux systems.  If you are a Window's user (or if you don't wish to install it natively on your laptop), you can install NSO on a Linux virtual machine.  For small lab networks you'll only need a single vCPU and 2-4 GB of RAM. 
+Cisco NSO can run on macOS or on Linux systems.  If you are a Window's user (or if you don't wish to install it natively on your laptop), you can install NSO on a Linux virtual machine.  For small lab networks you'll only need a single vCPU and 2-4 GB of RAM. If you use Vagrant to manager local Linux virtual machines, there is a NSO Vagrant file as well: [https://github.com/NSO-developer/nso-vagrant](https://github.com/NSO-developer/nso-vagrant).
 
 NSO also runs quite well within Docker Containers, and you can find resources for that at [gitlab.com/nso-developer/nso-docker](https://gitlab.com/nso-developer/nso-docker).
 
