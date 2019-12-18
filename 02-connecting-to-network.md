@@ -94,12 +94,14 @@ As you learned during the installation step, a Local Install unpacks and prepare
 1. One of the included scripts with an NSO installation is `ncs-setup` which makes it very easy to create instances of NSO from a Local Install.  You can look at the `--help` for full details, but the two options we need to know are 
     * `--dest` - the directory where you want to setup NSO
     * `--package` - the NEDs you want to this NSO instance to have installed.  You can specify this option multiple times.  
-1. Go ahead and run this command to setup an NSO instance in the current directory with the IOS, NX-OS, and ASA NEDs.  (use the name of the NED folder in `${NCS_DIR}/packages/neds`)
+1. Go ahead and run this command to setup an NSO instance in the current directory with the IOS, NX-OS, and ASA NEDs.  
+
+    > You will want to use the name of the NED folder in `${NCS_DIR}/packages/neds` for the latest NED version you've got installed for the target platform.
 
     ```bash
-    ncs-setup --package cisco-ios-cli-3.8 \
-    --package cisco-nx-cli-3.0 \
-    --package cisco-asa-cli-6.6 \
+    ncs-setup --package cisco-ios-cli-6.40 \
+    --package cisco-nx-cli-5.13 \
+    --package cisco-asa-cli-6.7 \
     --dest .
     ```
 
@@ -191,14 +193,14 @@ With our auth-group setup, let's go ahead and add our devices to the inventory. 
     * Address: `172.16.30.135` 
     * Protocol: SSH
         * We will disable SSH host-key-verification (in production systems you can configure the host-key or just "fetch" to learn)
-    * NED: `cisco-ios-cli-3.8`
+    * NED: `cisco-ios-cli-6.40`
 1. Enter this configuration into NSO. 
 
     ```text
     devices device dmz-rtr01-1
     address 172.16.30.135
-    auth-group labadmin
-    device-type cli ned-id cisco-ios-cli-3.8
+    authgroup labadmin
+    device-type cli ned-id cisco-ios-cli-6.40
     device-type cli protocol ssh
     ssh host-key-verification none
     ```
@@ -257,6 +259,7 @@ With our auth-group setup, let's go ahead and add our devices to the inventory. 
 1. Let's assume you want to use this third option, though do take a look at the file to see what commands are being ran.  The only major difference between device types is the `ned-id` value being used.  
 
     ```text 
+    top
     load merge lab-configs/nso-inventory.cfg
     ```
 
@@ -280,27 +283,27 @@ With our auth-group setup, let's go ahead and add our devices to the inventory. 
     ```
     NAME             ADDRESS        DESCRIPTION  NED ID             ADMIN STATE  
     ---------------------------------------------------------------------------
-    dmz-fw01-1       172.16.30.133  -            cisco-asa-cli-6.6  unlocked     
-    dmz-rtr01-1      172.16.30.135  -            cisco-ios-cli-3.8  unlocked     
-    dmz-rtr02-1      172.16.30.135  -            cisco-ios-cli-3.8  unlocked     
-    dmz-rtr02-2      172.16.30.136  -            cisco-ios-cli-3.8  unlocked     
-    dmz-sw01-1       172.16.30.107  -            cisco-nx-cli-3.0   unlocked     
-    dmz-sw01-2       172.16.30.108  -            cisco-nx-cli-3.0   unlocked     
-    dmz-sw02-1       172.16.30.109  -            cisco-nx-cli-3.0   unlocked     
-    dmz-sw02-2       172.16.30.110  -            cisco-nx-cli-3.0   unlocked     
-    fw-inside-sw01   172.16.30.122  -            cisco-ios-cli-3.8  unlocked     
-    fw-outside-sw01  172.16.30.123  -            cisco-ios-cli-3.8  unlocked     
-    fw01             172.16.30.145  -            cisco-asa-cli-6.6  unlocked     
-    fw02             172.16.30.146  -            cisco-asa-cli-6.6  unlocked     
-    internet-rtr     172.16.30.171  -            cisco-ios-cli-3.8  unlocked     
-    leaf01-1         172.16.30.103  -            cisco-nx-cli-3.0   unlocked     
-    leaf01-2         172.16.30.104  -            cisco-nx-cli-3.0   unlocked     
-    leaf02-1         172.16.30.105  -            cisco-nx-cli-3.0   unlocked     
-    leaf02-2         172.16.30.106  -            cisco-nx-cli-3.0   unlocked     
-    spine01-1        172.16.30.101  -            cisco-nx-cli-3.0   unlocked     
-    spine01-2        172.16.30.102  -            cisco-nx-cli-3.0   unlocked     
-    vm-sw01          172.16.30.121  -            cisco-ios-cli-3.8  unlocked     
-    vm-sw02          172.16.30.115  -            cisco-ios-cli-3.8  unlocked 
+    dmz-fw01-1       172.16.30.133  -            cisco-asa-cli-6.7  unlocked     
+    dmz-rtr01-1      172.16.30.135  -            cisco-ios-cli-6.40  unlocked     
+    dmz-rtr02-1      172.16.30.135  -            cisco-ios-cli-6.40  unlocked     
+    dmz-rtr02-2      172.16.30.136  -            cisco-ios-cli-6.40  unlocked     
+    dmz-sw01-1       172.16.30.107  -            cisco-nx-cli-5.13   unlocked     
+    dmz-sw01-2       172.16.30.108  -            cisco-nx-cli-5.13   unlocked     
+    dmz-sw02-1       172.16.30.109  -            cisco-nx-cli-5.13   unlocked     
+    dmz-sw02-2       172.16.30.110  -            cisco-nx-cli-5.13   unlocked     
+    fw-inside-sw01   172.16.30.122  -            cisco-ios-cli-6.40  unlocked     
+    fw-outside-sw01  172.16.30.123  -            cisco-ios-cli-6.40  unlocked     
+    fw01             172.16.30.145  -            cisco-asa-cli-6.7  unlocked     
+    fw02             172.16.30.146  -            cisco-asa-cli-6.7  unlocked     
+    internet-rtr     172.16.30.171  -            cisco-ios-cli-6.40  unlocked     
+    leaf01-1         172.16.30.103  -            cisco-nx-cli-5.13   unlocked     
+    leaf01-2         172.16.30.104  -            cisco-nx-cli-5.13   unlocked     
+    leaf02-1         172.16.30.105  -            cisco-nx-cli-5.13   unlocked     
+    leaf02-2         172.16.30.106  -            cisco-nx-cli-5.13   unlocked     
+    spine01-1        172.16.30.101  -            cisco-nx-cli-5.13   unlocked     
+    spine01-2        172.16.30.102  -            cisco-nx-cli-5.13   unlocked     
+    vm-sw01          172.16.30.121  -            cisco-ios-cli-6.40  unlocked     
+    vm-sw02          172.16.30.115  -            cisco-ios-cli-6.40  unlocked 
     ```
 
     </details>
