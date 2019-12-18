@@ -32,8 +32,8 @@ NSO requires Java to be installed to function.  Any method of installing Java sh
 ## Local vs System Installation 
 Before you install NSO onto your system, you need to decide whether to do a "System" or "Local" installation.  Here's a simple breakdown of the two.  
 
-* **System Install** is used when installing NSO for a centralized, "always-on", producttion grade purpose.  Is configured as a system daemon that would start and end with the underlying operating system.  
-* **Local Install** is used for development, lab, and evaluation purposes. It unpacks all the applicaiton components, including docs and examples, and allows the user to instantiate and start instances of NCS on demand.  A Local Install on a single workstation can be used by the engineer to run multiple, unrelated instances of NSO for different labs and demos. 
+* **System Install** is used when installing NSO for a centralized, "always-on", production grade purpose.  Is configured as a system daemon that would start and end with the underlying operating system.  
+* **Local Install** is used for development, lab, and evaluation purposes. It unpacks all the application components, including docs and examples, and allows the user to instantiate and start instances of NSO on demand.  A Local Install on a single workstation can be used by the engineer to run multiple, unrelated instances of NSO for different labs and demos. 
 
 As we are just getting started, we'll be using a "Local Installation" of NSO.  
 
