@@ -204,7 +204,7 @@ drwxr-xr-x   5 hapresto  staff   160B Nov 29 04:50 web-server-farm/```
 In order to "talk to" the network, NSO uses NEDs.  Cisco has NEDs for hundreds of different devices available for customers, and several are included in the installer.  Let's see what they are.  
 
 ```bash
-ll packages/neds/
+ll 
 
 # Output
 drwxr-xr-x  13 hapresto  staff   416B Nov 29 05:17 a10-acos-cli-3.0/
@@ -221,7 +221,126 @@ drwxr-xr-x  10 hapresto  staff   320B Nov 29 05:17 juniper-junos-nc-3.0/
 
 Here you can see there are NEDs for Cisco ASA, IOS, IOS XR, and NX-OS.  Also included are NEDs for other vendors including Juniper JunOS, A10, ALU and Dell. 
 
-> Note: The NEDs included in the installer may **NOT** be the latest versions available from Cisco, and may not have all features available in production NEDs.  If you have difficulty with an included NEDs, check with your Cisco account team or partner to learn if there is a newer NED for your platform. 
+> Note: The NEDs included in the installer are intended for evaluation, demonstration, and used with the included `examples.ncs` that are also included.  These are not the latest versions available, and often don't have all the features available in production NEDs. 
+
+#### Installing New NED Versions 
+Cisco also makes additional versions of some NEDs available on DevNet for evaulation and non-production use.  You can find them [here]().  
+
+For this getting started lab we'll be leveraging Cisco IOS, NX-OS and ASA devices.  Go ahead and download the updated NEDs from DevNet and we'll install them now!  
+
+> NOTE: the specific file names and versions you download maybe different from this guide.  Update the paths appropriately.  
+
+1. Like the NSO installer, the NEDs are signed bin files that need to be run to validate the download and extract the new code. 
+
+1. First, let's see the downloaded files - update the path for where your downloads are 
+
+    ```bash
+    cd ~/Downloads/
+    ls -l ncs*.bin
+
+    # Output 
+    -rw-r--r--@ 1 hapresto  staff   9708091 Dec 18 12:05 ncs-5.3-cisco-asa-6.7.7.signed.bin
+    -rw-r--r--@ 1 hapresto  staff  51233042 Dec 18 12:06 ncs-5.3-cisco-ios-6.40.1.signed.bin
+    -rw-r--r--@ 1 hapresto  staff   8400190 Dec 18 12:05 ncs-5.3-cisco-nx-5.13.1.1.signed.bin
+    ```
+
+1. Now make them "executable" 
+
+    ```bash
+    chmod +x ncs*.bin
+    ls -l ncs*.bin
+    ```
+
+    <details><summary>Output - now executable</summary>
+
+    ```bash
+    -rwxr-xr-x@ 1 hapresto  staff   9708091 Dec 18 12:05 ncs-5.3-cisco-asa-6.7.7.signed.bin
+    -rwxr-xr-x@ 1 hapresto  staff  51233042 Dec 18 12:06 ncs-5.3-cisco-ios-6.40.1.signed.bin
+    -rwxr-xr-x@ 1 hapresto  staff   8400190 Dec 18 12:05 ncs-5.3-cisco-nx-5.13.1.1.signed.bin
+    ```
+
+    </details>
+
+1. Run each file. 
+
+    ```bash
+    ./ncs-5.3-cisco-nx-5.13.1.1.signed.bin
+    ```
+
+    <details><summary>Output</summary>
+
+    ```bash
+    Unpacking...
+    Verifying signature...
+    Downloading CA certificate from http://www.cisco.com/security/pki/certs/crcam2.cer ...
+    Successfully downloaded and verified crcam2.cer.
+    Downloading SubCA certificate from http://www.cisco.com/security/pki/certs/innerspace.cer ...
+    Successfully downloaded and verified innerspace.cer.
+    Successfully verified root, subca and end-entity certificate chain.
+    Successfully fetched a public key from tailf.cer.
+    Successfully verified the signature of ncs-5.3-cisco-nx-5.13.1.1.tar.gz using tailf.cer
+    ```
+
+    </details>
+
+    > Repeat for all three files 
+
+1. You now have 3 tarballs (.tar.gz) files.  These are compressed versions of the NEDs. 
+
+    ```bash 
+    ls -l ncs*.tar.gz
+    ```
+
+    <details><summary>Output</summary>
+
+    ```bash
+    -rw-r--r--  1 hapresto  staff   9704896 Dec 12 21:11 ncs-5.3-cisco-asa-6.7.7.tar.gz
+    -rw-r--r--  1 hapresto  staff  51260488 Dec 13 22:58 ncs-5.3-cisco-ios-6.40.1.tar.gz
+    -rw-r--r--  1 hapresto  staff   8409288 Dec 18 09:09 ncs-5.3-cisco-nx-5.13.1.1.tar.gz
+    ```
+
+    </details>
+
+1. Navigate to the `packages/neds` directory for your local-install. 
+
+    ```bash
+    cd ~/nso-5.3/packages/neds
+    ```
+
+1. All we need to do now is extract the tarballs into this directory. 
+
+    > Update the path and file name for the NED versions you downloaded
+
+    ```bash
+    tar -zxvf ~/Downloads/ncs-5.3-cisco-nx-5.13.1.1.tar.gz
+    tar -zxvf ~/Downloads/ncs-5.3-cisco-ios-6.40.1.tar.gz
+    tar -zxvf ~/Downloads/ncs-5.3-cisco-asa-6.7.7.tar.gz
+
+    ls -l
+    ```
+
+    <details><summary>Output</summary>
+
+    ```bash
+    drwxr-xr-x  13 hapresto  staff   416 Nov 29 05:17 a10-acos-cli-3.0
+    drwxr-xr-x  12 hapresto  staff   384 Nov 29 05:17 alu-sr-cli-3.4
+    drwxr-xr-x  13 hapresto  staff   416 Nov 29 05:17 cisco-asa-cli-6.6
+    drwxr-xr-x  13 hapresto  staff   416 Dec 12 21:11 cisco-asa-cli-6.7
+    drwxr-xr-x  12 hapresto  staff   384 Nov 29 05:17 cisco-ios-cli-3.0
+    drwxr-xr-x  12 hapresto  staff   384 Nov 29 05:17 cisco-ios-cli-3.8
+    drwxr-xr-x  13 hapresto  staff   416 Dec 13 22:58 cisco-ios-cli-6.40
+    drwxr-xr-x  13 hapresto  staff   416 Nov 29 05:17 cisco-iosxr-cli-3.0
+    drwxr-xr-x  13 hapresto  staff   416 Nov 29 05:17 cisco-iosxr-cli-3.5
+    drwxr-xr-x  13 hapresto  staff   416 Nov 29 05:17 cisco-nx-cli-3.0
+    drwxr-xr-x  14 hapresto  staff   448 Dec 18 09:09 cisco-nx-cli-5.13
+    drwxr-xr-x  13 hapresto  staff   416 Nov 29 05:17 dell-ftos-cli-3.0
+    drwxr-xr-x  10 hapresto  staff   320 Nov 29 05:17 juniper-junos-nc-3.0
+    ```
+
+    </details>
+
+1. And now you have the newer NED versions available, as well as the demo/evaluation versions included with NSO itself! 
+
 
 ### `ncsrc`
 The last thing we want to notice are the files `ncsrc` and `ncsrc.tsch`.  These are shell scripts for bash and tsch that setup your `PATH` and other environment variables for NSO.  Depending on your shell, you'll `source` this file before starting your NSO work.  
