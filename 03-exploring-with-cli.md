@@ -667,7 +667,324 @@ Pretty nice right!  A couple of key points about rollback.
 * Depending on what has changed in the network since the commit you are trying to rollback, NSO may NOT be able to execute the rollback.  It will notify you of conflicts.  
 
 ### Device Templates
+In the previous example we looked at managing the configuration of devices, per device.  But what about when you want ot configure something on many devices?  There are several ways NSO can help with this, but the simplest way to get started is using Device Templates.  
 
+In this exercise we'll build a simple device template that can be used to configure the DNS server on network devices.  
+
+1. Go ahead and jump into `ncs_cli` like before, and enter `config` mode.  
+1. We'll iterate on our device template a couple times, making it more powerful, but for now we'll give a basic template.  
+
+    ```
+    devices template SET-DNS-SERVER
+    ned-id cisco-nx-cli-5.13
+    config
+    ip name-server servers 208.67.222.222
+    ip name-server servers 208.67.220.220
+    ```
+
+1. Let's see what this looks like to NSO. 
+
+    ```
+    show configuration
+    ```
+
+    <details><summary>Output</summary>
+
+    ```
+    devices template SET-DNS-SERVER
+     ned-id cisco-nx-cli-5.13
+      config
+       ip name-server servers [ 208.67.222.222 208.67.220.220 ]
+    ```
+    </details>
+
+    > One thing to notice here is how NSO takes the input of 2 different name servers and combines them into a list object within the CDB.  
+
+1. The first version of our template only addresses NX-OS devices (based on the `ned-id` block).  We'll circle back to add other network devices in a moment, but let's test this first version. 
+1. Commit the new template to NSO. 
+
+    ```
+    commit
+    ```
+
+1. Jump back to the `top` and let's test out the template. 
+
+    ```
+    top
+    devices device leaf01-1 apply-template template-name SET-DNS-SERVER
+    ```
+
+    <details><summary>Output</summary>
+
+    ```
+    apply-template-result {
+        device leaf01-1
+        result ok
+    }
+    ```
+    </details>
+
+1. Like other configuration changes, this simply stages a configuration to be pushed.  Look at what is staged. 
+
+    ```
+    show configuration
+    ```
+
+    <details><summary>Output</summary>
+
+    ```
+    devices device leaf01-1
+     config
+      ip name-server 208.67.220.220 208.67.222.222
+    ```
+    </details>
+
+1. Looks good, but we aren't done yet... let's unstage these changes.
+
+    ```
+    revert
+    ```
+
+1. At the prompt, enter `yes` to confirm. 
+
+    ```
+    ! EXAMPLE
+    All configuration changes will be lost. Proceed? [yes, NO] yes
+    ```
+
+1. We're now going to update the template to support IOS and ASA devices as well.  Enter this configuration into NSO. 
+
+    ```
+    devices template SET-DNS-SERVER
+    ned-id cisco-ios-cli-6.40
+    config
+    ip name-server name-server-list 208.67.222.222
+    ip name-server name-server-list 208.67.220.220
+    exit
+    exit
+
+    ! 2 exits to return back to the 'config-template-SET-DNS-SERVER' context
+    ned-id cisco-asa-cli-6.7
+    config
+    dns server-group DefaultDNS
+    name-server 208.67.220.220
+    name-server 208.67.222.222
+    ```
+
+    > Now our template knows how to configure the DNS Servers on all three of our network types.  
+
+1. Save the changes to the template and return to `top`
+
+    ```
+    commit
+    top
+    ```
+
+1. Now we'll use the `device-groups` that we setup initially to push this change out to the entire network with super ease. 
+
+    ```
+    devices device-group ALL apply-template template-name SET-DNS-SERVER
+    ```
+
+
+    <details><summary>Output</summary>
+
+    ```
+    apply-template-result {
+        device dmz-fw01-1
+        result ok
+    }
+    apply-template-result {
+        device dmz-rtr02-1
+        result ok
+    }
+    apply-template-result {
+        device dmz-rtr02-2
+        result ok
+    }
+    apply-template-result {
+        device dmz-sw01-1
+        result ok
+    }
+    apply-template-result {
+        device dmz-sw01-2
+        result ok
+    }
+    apply-template-result {
+        device dmz-sw02-1
+        result ok
+    }
+    apply-template-result {
+        device dmz-sw02-2
+        result ok
+    }
+    apply-template-result {
+        device fw-inside-sw01
+        result ok
+    }
+    apply-template-result {
+        device fw-outside-sw01
+        result ok
+    }
+    apply-template-result {
+        device fw01
+        result ok
+    }
+    apply-template-result {
+        device fw02
+        result ok
+    }
+    apply-template-result {
+        device internet-rtr
+        result ok
+    }
+    apply-template-result {
+        device leaf01-1
+        result ok
+    }
+    apply-template-result {
+        device leaf01-2
+        result ok
+    }
+    apply-template-result {
+        device leaf02-1
+        result ok
+    }
+    apply-template-result {
+        device leaf02-2
+        result ok
+    }
+    apply-template-result {
+        device spine01-1
+        result ok
+    }
+    apply-template-result {
+        device spine01-2
+        result ok
+    }
+    apply-template-result {
+        device vm-sw01
+        result ok
+    }
+    apply-template-result {
+        device vm-sw02
+        result ok
+    }
+    ```
+    </details>
+
+    > Pretty awesome right?  One simple command and you've updated every device all at once.  That's AUTOMATION!
+
+1. And let's see what configuration is ready to be sent to the devices.  You can look at `show configuration` if you'd like, but we'll look at the native configuration. 
+
+    ```
+    commit dry-run outformat native
+    ```
+
+    <details><summary>Output</summary>
+
+    ```
+    native {
+        device {
+            name dmz-rtr02-1
+            data ip name-server 208.67.222.222
+                ip name-server 208.67.220.220
+        }
+        device {
+            name dmz-rtr02-2
+            data ip name-server 208.67.222.222
+                ip name-server 208.67.220.220
+        }
+        device {
+            name dmz-sw01-1
+            data ip name-server 208.67.220.220 208.67.222.222
+        }
+        device {
+            name dmz-sw01-2
+            data ip name-server 208.67.220.220 208.67.222.222
+        }
+        device {
+            name dmz-sw02-1
+            data ip name-server 208.67.220.220 208.67.222.222
+        }
+        device {
+            name dmz-sw02-2
+            data ip name-server 208.67.220.220 208.67.222.222
+        }
+        device {
+            name fw-inside-sw01
+            data ip name-server 208.67.222.222
+                ip name-server 208.67.220.220
+        }
+        device {
+            name fw-outside-sw01
+            data ip name-server 208.67.222.222
+                ip name-server 208.67.220.220
+        }
+        device {
+            name fw01
+            data dns server-group DefaultDNS
+                name-server 208.67.220.220
+                name-server 208.67.222.222
+                exit
+        }
+        device {
+            name fw02
+            data dns server-group DefaultDNS
+                name-server 208.67.220.220
+                name-server 208.67.222.222
+                exit
+        }
+        device {
+            name internet-rtr
+            data ip name-server 208.67.222.222
+                ip name-server 208.67.220.220
+        }
+        device {
+            name leaf01-1
+            data ip name-server 208.67.220.220 208.67.222.222
+        }
+        device {
+            name leaf01-2
+            data ip name-server 208.67.220.220 208.67.222.222
+        }
+        device {
+            name leaf02-1
+            data ip name-server 208.67.220.220 208.67.222.222
+        }
+        device {
+            name leaf02-2
+            data ip name-server 208.67.220.220 208.67.222.222
+        }
+        device {
+            name spine01-1
+            data ip name-server 208.67.220.220 208.67.222.222
+        }
+        device {
+            name spine01-2
+            data ip name-server 208.67.220.220 208.67.222.222
+        }
+        device {
+            name vm-sw01
+            data ip name-server 208.67.222.222
+                ip name-server 208.67.220.220
+        }
+        device {
+            name vm-sw02
+            data ip name-server 208.67.222.222
+                ip name-server 208.67.220.220
+        }
+    }
+    ```
+    </details>
+
+1. Finally, push it out to the devices. 
+
+    ```
+    commit
+    ```
+
+This is just a quick introduction to templates.  Templates have many other uses and features, we'll see more in later exercises.  
 
 ## Device Operational State
 
