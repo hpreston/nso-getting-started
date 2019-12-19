@@ -88,7 +88,7 @@ As you learned during the installation step, a Local Install unpacks and prepare
     cd ~/code/nso-getting-started/nso-instance/
     ```
 
-    > This folder has a `.gitignore` and `Makefile` contained within.  The ignore file is there to prevent commiting NSO files to the repository, and the `Makefile` provides some helpful shortcuts and targets that you'll see shortly.  The folder `lab-configs/` contains a few NSO configuration files for reference or use in the lab. 
+    > This folder has a `.gitignore` and `Makefile` contained within.  The ignore file is there to prevent committing NSO files to the repository, and the `Makefile` provides some helpful shortcuts and targets that you'll see shortly.  The folder `lab-configs/` contains a few NSO configuration files for reference or use in the lab. 
 
 1. If you haven't already, be sure to "source" the `ncsrc` file.  
 1. One of the included scripts with an NSO installation is `ncs-setup` which makes it very easy to create instances of NSO from a Local Install.  You can look at the `--help` for full details, but the two options we need to know are 
@@ -127,7 +127,7 @@ As you learned during the installation step, a Local Install unpacks and prepare
     </details>
 
 ## Setting up Device Authentication
-With NSO running, we now need to add our devices into it's "inventory" so that it can read and write data.  NSO uses "auth-groups" to setup credentials for device access.  We'll setup a simple `auth-group` for our network.  
+With NSO running, we now need to add our devices into it's "inventory" so that it can read and write data.  NSO uses "authgroups" to setup credentials for device access.  We'll setup a simple `authgroup` for our network.  
 
 1. If not already, start the NSO CLI with `ncs_cli -C -u admin`. 
 1. Enter into "config mode". 
@@ -145,7 +145,7 @@ With NSO running, we now need to add our devices into it's "inventory" so that i
 
     </details>
 
-1. We will setup a new auth-group called "labadmin".  This group will use a default username/password combination of `cisco / cisco` for devices, with a "secondary" (ie 'enable') password also of `cisco`. These commands will set this up. 
+1. We will setup a new authgroup called "labadmin".  This group will use a default username/password combination of `cisco / cisco` for devices, with a "secondary" (ie 'enable') password also of `cisco`. These commands will set this up. 
 
     ```text 
     devices authgroups group labadmin
@@ -172,19 +172,19 @@ With NSO running, we now need to add our devices into it's "inventory" so that i
 
     </details>
 
-    > This is a very handy way to see what configuraiton is ready to be commited before you finalize it.  Also, note that NSO uses a local encryption model to store the credentials in it's database.  
+    > This is a very handy way to see what configuration is ready to be committed before you finalize it.  Also, note that NSO uses a local encryption model to store the credentials in it's database.  
 
 1. Now `commit` this to lock in the changes.  
 
-> You can create as many `auth-groups` as you need to for the different variations of authentication used across your network.  Auth-groups also can leverage SNMP or certificates in addition to traditional username/passwords .  Furthermore, NSO supports very powerful methods of RBAC for identifying and leveraging different authentication and authorization levels depending on the user logged into NSO.  These features are beyond scope for this introduction. 
+> You can create as many `authgroups` as you need to for the different variations of authentication used across your network.  authgroups also can leverage SNMP or certificates in addition to traditional username/passwords .  Furthermore, NSO supports very powerful methods of RBAC for identifying and leveraging different authentication and authorization levels depending on the user logged into NSO.  These features are beyond scope for this introduction. 
 
 ## Adding Devices to Cisco NSO 
-With our auth-group setup, let's go ahead and add our devices to the inventory.  To add a device you'll need the following information: 
+With our authgroup setup, let's go ahead and add our devices to the inventory.  To add a device you'll need the following information: 
 
-* The devices address - IP or FQDN 
+* The device's address - IP or FQDN. 
 * The protocol (ssh/telnet) and port (if non-standard) to connect to the device. 
-* The devices auth-group to use (see above)
-* The NED you'll use to connect to the device 
+* The device's authgroup to use (see above).
+* The NED you'll use to connect to the device. 
 
 > We'll walk through the first device step by step, then bulk add the rest of them. 
 
@@ -254,7 +254,7 @@ With our auth-group setup, let's go ahead and add our devices to the inventory. 
 1. Excellent!  Now you just need to repeat the process for the remaining devices, and there are a few options.  
     1. You can manually type the commands for each device - great practice but a bit boring. 
     1. You can open up the file [`nso-inventory.cfg`](nso-instance/lab-configs/nso-inventory.cfg) from the `nso-instance` directory that has the configuration needed all ready for you and copy/paste it.  A bit faster, but not the best option. 
-    1. You can use the `load merge` command from NSO to read the file into NSO and stage it for commiting.  
+    1. You can use the `load merge` command from NSO to read the file into NSO and stage it for committing.  
 
 1. Let's assume you want to use this third option, though do take a look at the file to see what commands are being ran.  The only major difference between device types is the `ned-id` value being used.  
 
