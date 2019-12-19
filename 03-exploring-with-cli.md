@@ -7,7 +7,7 @@ These first exercises will explore device configuration through NSO.  We'll look
 ### Reading Device Configuration 
 When you did the initial `sync-from` the network NSO retrieved all the current configurations of the devices and stored them in the "CDB".  This is NSO's Configuration Database, and the heart of the "magic" that makes NSO so powerful.  With the CDB, you now have access to the entire network's configuration from a single point through the NSO CLI, web ui, or through the variety of APIs NSO makes available. 
 
-Even more exciting, this configuration isn't just another text file backup, but rather a fully modeled configuration.  If that didn't **WOW** you, just wait!
+Even more exciting, this configuration isn't just another text file backup, but rather a fully modeled configuration. All of your network devices, even old legacy CLI devices, now have a fully parsed local snapshot of the configuration.  If that didn't **WOW** you, just wait!
 
 1. Start out by accessing the `ncs_cli` 
 
@@ -464,7 +464,7 @@ Now that you've seen how NSO can be used to read the current network configurati
 
 1. Okay, let's get to that configuration change.  And what's better for a configuration change in the network than adding a new VLAN and interface!  Enter these commands. 
 
-    > Don't forget you can use TAB completion.  And notice the use of `nx:` in the configuration to indicate the NED or device type we are working with. 
+    > Don't forget you can use TAB completion.  And notice the use of `nx:` in the configuration to indicate the NED or device type we are working with. Also note that the tab completion is **case sensitive** for that first letter. Common mistakes are nx:interface vlan instead of nx:interface Vlan. 
 
     ```
     nx:vlan 42
@@ -667,7 +667,7 @@ Pretty nice right!  A couple of key points about rollback.
 * Depending on what has changed in the network since the commit you are trying to rollback, NSO may NOT be able to execute the rollback.  It will notify you of conflicts.  
 
 ### Device Templates
-In the previous example we looked at managing the configuration of devices, per device.  But what about when you want ot configure something on many devices?  There are several ways NSO can help with this, but the simplest way to get started is using Device Templates.  
+In the previous example we looked at managing the configuration of devices, per device.  But what about when you want to configure something on many devices?  There are several ways NSO can help with this, but the simplest way to get started is using Device Templates.  
 
 In this exercise we'll build a simple device template that can be used to configure the DNS server on network devices.  
 
