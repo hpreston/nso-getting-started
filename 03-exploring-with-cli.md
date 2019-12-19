@@ -136,7 +136,7 @@ Even more exciting, this configuration isn't just another text file backup, but 
     ```
     </details>
 
-1. What you should see is the same configuraiton that we used to add this device into the NSO inventory, pretty neat huh!  
+1. What you should see is the same configuration that we used to add this device into the NSO inventory, pretty neat huh!  
 
 1. Let's use the power of the modeled config a bit more with these next exercises.  
     * Retrieve the list of vlans configured on the device 
@@ -193,7 +193,7 @@ Even more exciting, this configuration isn't just another text file backup, but 
         ```
         </details>    
 
-        > The `nx:vlan` highlights the use of NEDs to interact with the devices.  Each type of device, and therefore NED, has it's own data model for configuration and operational data.  The `nx:` indicates the NED, or specifially the YANG model, that is used for the data.  
+        > The `nx:vlan` highlights the use of NEDs to interact with the devices.  Each type of device, and therefore NED, has it's own data model for configuration and operational data.  The `nx:` indicates the NED, or specifically the YANG model, that is used for the data.  
 
     * What if you wanted the data in a format better for programmability.. let's say JSON.  
 
@@ -434,7 +434,7 @@ Now that you've seen how NSO can be used to read the current network configurati
     admin@ncs(config-device-leaf01-1)# 
     ```
 
-1. Remember from our prior exercise that the device configuraiton is under the `config` section in the device model.  So we'll enter another `config` to indicate we'll be configuring the device. 
+1. Remember from our prior exercise that the device configuration is under the `config` section in the device model.  So we'll enter another `config` to indicate we'll be configuring the device. 
 
     ```
     config
@@ -486,7 +486,7 @@ Now that you've seen how NSO can be used to read the current network configurati
 
     > You could just type `exit` over and over again, but `top` is so much faster. 
 
-1. Now let's look at the current configuration that is waiting to be commited. 
+1. Now let's look at the current configuration that is waiting to be committed. 
 
     ```
     show configuration
@@ -544,7 +544,7 @@ Now that you've seen how NSO can be used to read the current network configurati
     ```
     </details>
 
-1. One last question you might have before you're ready to `commit` this to the network, is what will NSO actually SEND to your device?  NSO lets you do a `dry-run` before committing, and it has a handy `native` format that shows you excatly what will be sent away.  
+1. One last question you might have before you're ready to `commit` this to the network, is what will NSO actually SEND to your device?  NSO lets you do a `dry-run` before committing, and it has a handy `native` format that shows you exactly what will be sent away.  
 
     ```
     commit dry-run outformat native
@@ -664,7 +664,7 @@ Pretty nice right!  A couple of key points about rollback.
 
 * NSO stores rollback files for every change, and you can load up a specific change by referencing the ID number of a change. 
 * Each `commit` is a rollback.  So if a single commit updates 10 devices, and 30 configuration lines on each device, a rollback will undo all that configuration. 
-* Depending on what has changed in the network since the commit you are trying to rollback, NSO may NOT be able to execute teh rollback.  It will notify you of conflicts.  
+* Depending on what has changed in the network since the commit you are trying to rollback, NSO may NOT be able to execute the rollback.  It will notify you of conflicts.  
 
 ### Device Templates
 
