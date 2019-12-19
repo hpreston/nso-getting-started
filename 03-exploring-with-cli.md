@@ -739,7 +739,7 @@ In this exercise we'll build a simple device template that can be used to config
     ```
     </details>
 
-1. Looks good, but we aren't done yet... let's unstage these changes.
+1. Looks good, but we aren't done yet... let's un-stage these changes.
 
     ```
     revert
@@ -766,6 +766,7 @@ In this exercise we'll build a simple device template that can be used to config
     ! 2 exits to return back to the 'config-template-SET-DNS-SERVER' context
     ned-id cisco-asa-cli-6.7
     config
+    dns domain-lookup mgmt
     dns server-group DefaultDNS
     name-server 208.67.220.220
     name-server 208.67.222.222
@@ -923,14 +924,16 @@ In this exercise we'll build a simple device template that can be used to config
         }
         device {
             name fw01
-            data dns server-group DefaultDNS
+            data dns domain-lookup mgmt
+                dns server-group DefaultDNS
                 name-server 208.67.220.220
                 name-server 208.67.222.222
                 exit
         }
         device {
             name fw02
-            data dns server-group DefaultDNS
+            data dns domain-lookup mgmt
+                dns server-group DefaultDNS
                 name-server 208.67.220.220
                 name-server 208.67.222.222
                 exit
@@ -976,7 +979,7 @@ In this exercise we'll build a simple device template that can be used to config
         }
     }
     ```
-    </details>
+    </details>    
 
 1. Finally, push it out to the devices. 
 
@@ -987,5 +990,377 @@ In this exercise we'll build a simple device template that can be used to config
 This is just a quick introduction to templates.  Templates have many other uses and features, we'll see more in later exercises.  
 
 ## Device Operational State
+We'll leave device configuration behind for a little bit and see what NSO offers from an operational state view.  
 
-## NSO Live Status Device Interaction 
+Much of network automation, particularly the early projects relate not to updating configuration, but rather gathering details about the current state of the network for visibility and troubleshooting.  
+
+Along with modeling out the device configuration, NEDs will often include the ability to read current operational state from the network - similar to running `show` commands on a device.  We'll checkout some of them now.  
+
+1. Go ahead and launch `ncs_cli`, but **don't** go into `config` mode.  
+
+### Platform Info 
+Here's one that has saved me all sorts of time - basic platform information.  As part of the initial connection to a device, NSO queries the device for it's model, serial, version, etc.  
+
+1. Take a look at what is gathered.
+
+    ```
+    show devices device leaf01-1 platform                                 
+    ```
+
+    <details><summary>Output</summary>
+
+    ```
+    platform name NX-OS
+    platform version 9.2(2)
+    platform model "cisco Nexus9000 9000v Chassis "
+    platform serial-number 9EMO859VJOO
+    ```
+    </details>
+
+1. Of if you just want the serial number, you can of course... 
+
+    ```
+    show devices device leaf01-1 platform serial-number
+    ```
+
+1. And to go even bigger... what if you want **ALL** serial numbers?  
+
+    ```
+    show devices device * platform serial-number 
+    ```
+
+    <details><summary>Output</summary>
+
+    ```
+                    SERIAL       
+    NAME             NUMBER       
+    ------------------------------
+    dmz-fw01-1       9AHFCCB49J1  
+    dmz-rtr01-1      97DHMECAG7T  
+    dmz-rtr02-1      97DHMECAG7T  
+    dmz-rtr02-2      9X83MITDMNZ  
+    dmz-sw01-1       9TJ2V92YN1J  
+    dmz-sw01-2       9I95731WUFD  
+    dmz-sw02-1       9S151GTQ5EX  
+    dmz-sw02-2       9SH0ETX3AU3  
+    fw-inside-sw01   9YSYIAS6DX5  
+    fw-outside-sw01  947MPGL9D9W  
+    fw01             9AFK2A2QF29  
+    fw02             9ALWBDLW2L6  
+    internet-rtr     9AXL4JQRMM6  
+    leaf01-1         9EMO859VJOO  
+    leaf01-2         97HPIKZ4FFI  
+    leaf02-1         9I6F9OKAEOY  
+    leaf02-2         9DMNLYGAICX  
+    spine01-1        957MQP34EU4  
+    spine01-2        9HLJ93K3214  
+    vm-sw01          9PF0O7C0LZE  
+    vm-sw02          9YKKIHL53I5
+    ```
+    </details>
+
+    > That wildcard is super handy huh?!?
+
+#### Live Status
+Devices have a `live-status` part of the model that indicates details that NSO will read from the device at the time of execution, rather than pulled from the CDB.  
+
+1. Let's check on the current status of the port-channels on a device. 
+
+    ```
+    show devices device leaf01-1 live-status port-channel
+    ```
+
+    <details><summary>Output</summary>
+
+    ```
+                                                                    PORT    
+    GROUP  PORT CHANNEL   LAYER  STATUS  TYPE  PRTCL  PORT          STATUS  
+    ------------------------------------------------------------------------
+    1      port-channel1  S      U       Eth   LACP   Ethernet1/1   P       
+                                                    Ethernet1/2   P       
+    2      port-channel2  S      U       Eth   LACP   Ethernet1/3   P       
+                                                    Ethernet1/4   P       
+    3      port-channel3  S      U       Eth   LACP   Ethernet1/11  P  
+    ```
+    </details>
+
+1. Or maybe the routing table. 
+
+    ```
+    show devices device leaf01-1 live-status ip route
+    ```
+
+    <details><summary>Partial Output</summary>
+
+    ```
+    live-status ip route vrf backdoor
+    prefix 172.16.30.0/24
+    ucast-nhops 1
+    mcast-nhops 0
+    attached    true
+    path 172.16.30.2
+    uptime     P4DT2H41M12S
+    ifname     Vlan3001
+    pref       0
+    metric     0
+    clientname direct
+    ubest      true
+    prefix 172.16.30.1/32
+    ucast-nhops 1
+    mcast-nhops 0
+    attached    true
+    path 172.16.30.1
+    uptime     P4DT2H40M50S
+    ifname     Vlan3001
+    pref       0
+    metric     0
+    clientname hsrp
+    ubest      true
+    prefix 172.16.30.2/32
+    ucast-nhops 1
+    mcast-nhops 0
+    attached    true
+    path 172.16.30.2
+    uptime     P4DT2H41M12S
+    ifname     Vlan3001
+    pref       0
+    metric     0
+    clientname local
+    ubest      true
+    live-status ip route vrf default
+    live-status ip route vrf dmz
+    prefix 0.0.0.0/0
+    ucast-nhops 1
+    mcast-nhops 0
+    attached    false
+    path 10.225.250.4
+    uptime     P4DT2H39M6S
+    pref       1
+    metric     0
+    clientname static
+    ubest      true
+    prefix 10.225.1.0/24
+    ucast-nhops 1
+    mcast-nhops 0
+    attached    false
+    path 10.225.250.36
+    uptime     P4DT2H38M58S
+    ifname     Vlan100
+    pref       110
+    metric     90
+    clientname ospf-1
+    ubest      true
+    .
+    .
+    ```
+    </details>
+
+    * Uh, oh... the default formating isn't super friendly to the human reader.  Luckily NSO can force a table format for output.  
+
+    ```
+    show devices device leaf01-1 live-status ip route | tab
+    ```
+
+    <details><summary>Partial Output</summary>
+
+    ```
+                                UCAST  MCAST                                                                                    
+    NAME        IPPREFIX          NHOPS  NHOPS  ATTACHED  IPNEXTHOP      UPTIME        IFNAME    PREF  METRIC  CLIENTNAME  UBEST  
+    ------------------------------------------------------------------------------------------------------------------------------
+    backdoor    172.16.30.0/24    1      0      true      172.16.30.2    P4DT2H44M33S  Vlan3001  0     0       direct      true   
+                172.16.30.1/32    1      0      true      172.16.30.1    P4DT2H44M11S  Vlan3001  0     0       hsrp        true   
+                172.16.30.2/32    1      0      true      172.16.30.2    P4DT2H44M33S  Vlan3001  0     0       local       true   
+    default                                                                                                                       
+    dmz         0.0.0.0/0         1      0      false     10.225.250.4   P4DT2H42M27S  -         1     0       static      true   
+                10.225.1.0/24     1      0      false     10.225.250.36  P4DT2H42M19S  Vlan100   110   90      ospf-1      true   
+                10.225.10.0/24    1      0      false     10.225.250.36  P4DT2H42M19S  Vlan100   110   90      ospf-1      true   
+                10.225.11.0/24    1      0      false     10.225.250.36  P4DT2H42M19S  Vlan100   110   90      ospf-1      true   
+                10.225.17.0/24    1      0      true      10.225.17.2    P4DT2H44M49S  Vlan201   0     0       direct      true   
+                10.225.17.1/32    1      0      true      10.225.17.1    P4DT2H44M26S  Vlan201   0     0       hsrp        true   
+                10.225.17.2/32    1      0      true      10.225.17.2    P4DT2H44M49S  Vlan201   0     0       local       true   
+                10.225.18.0/24    1      0      false     10.225.250.36  P4DT2H42M19S  Vlan100   110   90      ospf-1      true   
+                10.225.19.0/24    1      0      false     10.225.250.36  P4DT2H42M19S  Vlan100   110   90      ospf-1      true   
+                10.225.2.0/24     1      0      false     10.225.250.36  P4DT2H42M19S  Vlan100   110   90      ospf-1      true   
+                10.225.250.0/29   1      0      false     10.225.250.36  P4DT2H42M27S  Vlan100   110   50      ospf-1      true   
+                10.225.250.16/29  1      0      false     10.225.250.36  P4DT2H42M27S  Vlan100   110   51      ospf-1      true   
+                10.225.250.24/29  1      0      false     10.225.250.36  P4DT2H42M27S  Vlan100   110   51      ospf-1      true   
+                10.225.250.32/29  1      0      true      10.225.250.34  P4DT2H45M1S   Vlan100   0     0       direct      true   
+                10.225.250.33/32  1      0      true      10.225.250.33  P4DT2H44M39S  Vlan100   0     0       hsrp        true   
+                10.225.250.34/32  1      0      true      10.225.250.34  P4DT2H45M1S   Vlan100   0     0       local       true   
+                10.225.250.48/29  1      0      false     10.225.250.36  P4DT2H42M27S  Vlan100   110   50      ospf-1      true   
+                10.225.250.8/29   1      0      false     10.225.250.36  P4DT2H42M27S  Vlan100   110   50      ospf-1      true   
+                10.225.49.0/24    1      0      false     10.225.250.36  P4DT2H42M19S  Vlan100   110   90      ospf-1      true   
+                10.225.64.0/24    1      0      false     10.225.250.36  P4DT2H42M27S  Vlan100   110   20      ospf-1      true   
+                10.225.64.0/27    1      0      false     10.225.250.36  P4DT2H42M27S  Vlan100   110   20      ospf-1      true   
+                10.225.9.0/24     1      0      true      10.225.9.2     P4DT2H44M58S  Vlan101   0     0       direct      true   
+
+    ```
+    </details>  
+
+There is a lot of information available through `live-status` feel free to poke around and explore. 
+
+## Live Status and Arbitrary Commands
+NSO is great, but occasionally the NED may not support the specific configuration bit, or operational data that you're looking for.  Now when this happens for a customer, they can easily open a support ticket with the Cisco NSO team explaining what is missing, and the NEDs can be updated to support what is needed. These updates often only take a few days to be vetted, tested, and implemented by Cisco and updated NEDs made available to the customer. 
+
+> Note: Once you become familiar with the more advanced topics around NSO development, you could even build your own packages and code to add these features yourself.
+
+However, for immediate needs, `live-status` supports sending arbitrary commands to a network device and returning the result.  Let's see a quick example of this in action.  
+
+1. Suppose you needed to check the license usage on all your Nexus switches.  This isn't data that the NED currently supports (though I probably should open a request to have it added), so we'll use `live-status` to gather the info. 
+
+1. First, let's check the status on a single device. 
+
+    ```
+    devices device leaf01-1 live-status exec show license usage
+    ```
+
+    <details><summary>Output</summary>
+
+    ```
+    result 
+    Feature                      Ins  Lic   Status Expiry Date Comments
+                                    Count
+    --------------------------------------------------------------------------------
+    N9K_LIC_1G                    No    -   Unused             -
+    VPN_FABRIC                    No    -   Unused             -
+    NXOS_OE_PKG                   No    -   Unused             -
+    FCOE_NPV_PKG                  No    -   Unused             -
+    SECURITY_PKG                  No    0   Unused             -
+    N9K_UPG_EX_10G                No    -   Unused             -
+    TP_SERVICES_PKG               No    -   Unused             -
+    NXOS_ADVANTAGE_GF             No    -   Unused             -
+    NXOS_ADVANTAGE_M4             No    -   Unused             -
+    NXOS_ADVANTAGE_XF             No    -   Unused             -
+    NXOS_ESSENTIALS_GF            No    -   Unused             -
+    NXOS_ESSENTIALS_M4            No    -   Unused             -
+    NXOS_ESSENTIALS_XF            No    -   Unused             -
+    SAN_ENTERPRISE_PKG            No    -   Unused             -
+    PORT_ACTIVATION_PKG           No    0   Unused             -
+    NETWORK_SERVICES_PKG          No    -   Unused             -
+    NXOS_ADVANTAGE_M8-16          No    -   Unused             -
+    NXOS_ESSENTIALS_M8-16         No    -   Unused             -
+    FC_PORT_ACTIVATION_PKG        No    0   Unused             -
+    LAN_ENTERPRISE_SERVICES_PKG   No    -   Unused             -
+    --------------------------------------------------------------------------------
+    ```
+    </details>
+
+    > Notice that this isn't a `show` command.
+
+1. Now we'll use wild-card commands to run the same against all the `leaf` switches.  
+
+    > Note: You can't use `live-status` with `device-groups` because a group of device could leverage different NEDs. 
+
+    ```
+    devices device leaf* live-status exec show license usage
+    ```
+
+    <details><summary>Partial Output</summary>
+
+    ```
+    devices device leaf01-1 live-status exec show
+        result 
+    Feature                      Ins  Lic   Status Expiry Date Comments
+                                    Count
+    --------------------------------------------------------------------------------
+    N9K_LIC_1G                    No    -   Unused             -
+    VPN_FABRIC                    No    -   Unused             -
+    NXOS_OE_PKG                   No    -   Unused             -
+    FCOE_NPV_PKG                  No    -   Unused             -
+    SECURITY_PKG                  No    0   Unused             -
+    N9K_UPG_EX_10G                No    -   Unused             -
+    TP_SERVICES_PKG               No    -   Unused             -
+    NXOS_ADVANTAGE_GF             No    -   Unused             -
+    NXOS_ADVANTAGE_M4             No    -   Unused             -
+    NXOS_ADVANTAGE_XF             No    -   Unused             -
+    NXOS_ESSENTIALS_GF            No    -   Unused             -
+    NXOS_ESSENTIALS_M4            No    -   Unused             -
+    NXOS_ESSENTIALS_XF            No    -   Unused             -
+    SAN_ENTERPRISE_PKG            No    -   Unused             -
+    PORT_ACTIVATION_PKG           No    0   Unused             -
+    NETWORK_SERVICES_PKG          No    -   Unused             -
+    NXOS_ADVANTAGE_M8-16          No    -   Unused             -
+    NXOS_ESSENTIALS_M8-16         No    -   Unused             -
+    FC_PORT_ACTIVATION_PKG        No    0   Unused             -
+    LAN_ENTERPRISE_SERVICES_PKG   No    -   Unused             -
+    --------------------------------------------------------------------------------
+
+    devices device leaf01-2 live-status exec show
+        result 
+    Feature                      Ins  Lic   Status Expiry Date Comments
+                                    Count
+    --------------------------------------------------------------------------------
+    N9K_LIC_1G                    No    -   Unused             -
+    VPN_FABRIC                    No    -   Unused             -
+    NXOS_OE_PKG                   No    -   Unused             -
+    FCOE_NPV_PKG                  No    -   Unused             -
+    SECURITY_PKG                  No    0   Unused             -
+    N9K_UPG_EX_10G                No    -   Unused             -
+    TP_SERVICES_PKG               No    -   Unused             -
+    NXOS_ADVANTAGE_GF             No    -   Unused             -
+    NXOS_ADVANTAGE_M4             No    -   Unused             -
+    NXOS_ADVANTAGE_XF             No    -   Unused             -
+    NXOS_ESSENTIALS_GF            No    -   Unused             -
+    NXOS_ESSENTIALS_M4            No    -   Unused             -
+    NXOS_ESSENTIALS_XF            No    -   Unused             -
+    SAN_ENTERPRISE_PKG            No    -   Unused             -
+    PORT_ACTIVATION_PKG           No    0   Unused             -
+    NETWORK_SERVICES_PKG          No    -   Unused             -
+    NXOS_ADVANTAGE_M8-16          No    -   Unused             -
+    NXOS_ESSENTIALS_M8-16         No    -   Unused             -
+    FC_PORT_ACTIVATION_PKG        No    0   Unused             -
+    LAN_ENTERPRISE_SERVICES_PKG   No    -   Unused             -
+    --------------------------------------------------------------------------------
+
+    devices device leaf02-1 live-status exec show
+        result 
+    Feature                      Ins  Lic   Status Expiry Date Comments
+                                    Count
+    --------------------------------------------------------------------------------
+    N9K_LIC_1G                    No    -   Unused             -
+    VPN_FABRIC                    No    -   Unused             -
+    NXOS_OE_PKG                   No    -   Unused             -
+    FCOE_NPV_PKG                  No    -   Unused             -
+    SECURITY_PKG                  No    0   Unused             -
+    N9K_UPG_EX_10G                No    -   Unused             -
+    TP_SERVICES_PKG               No    -   Unused             -
+    NXOS_ADVANTAGE_GF             No    -   Unused             -
+    NXOS_ADVANTAGE_M4             No    -   Unused             -
+    NXOS_ADVANTAGE_XF             No    -   Unused             -
+    NXOS_ESSENTIALS_GF            No    -   Unused             -
+    NXOS_ESSENTIALS_M4            No    -   Unused             -
+    NXOS_ESSENTIALS_XF            No    -   Unused             -
+    SAN_ENTERPRISE_PKG            No    -   Unused             -
+    PORT_ACTIVATION_PKG           No    0   Unused             -
+    NETWORK_SERVICES_PKG          No    -   Unused             -
+    NXOS_ADVANTAGE_M8-16          No    -   Unused             -
+    NXOS_ESSENTIALS_M8-16         No    -   Unused             -
+    FC_PORT_ACTIVATION_PKG        No    0   Unused             -
+    LAN_ENTERPRISE_SERVICES_PKG   No    -   Unused             -
+    --------------------------------------------------------------------------------
+
+    devices device leaf02-2 live-status exec show
+        result 
+    Feature                      Ins  Lic   Status Expiry Date Comments
+                                    Count
+    --------------------------------------------------------------------------------
+    N9K_LIC_1G                    No    -   Unused             -
+    VPN_FABRIC                    No    -   Unused             -
+    NXOS_OE_PKG                   No    -   Unused             -
+    .
+    .
+    ```
+    </details>
+
+1. Many times you need to gather data like this for later processing, or to share with someone.  For any command, NSO allows you to `save` the output to a file. 
+
+    ```
+    devices device leaf* live-status exec show license usage | save leaf-license-usage.txt
+    ```
+
+1. If you exit from NSO, you'll find a new file in your current directory with this data.  
+
+    ```bash
+    ll leaf-license-usage.txt 
+    -rw-r--r--  1 hapresto  staff   6.2K Dec 19 15:22 leaf-license-usage.txt
+    ```
