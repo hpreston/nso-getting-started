@@ -1204,6 +1204,15 @@ Let's create the following groups
     device-name internet-rtr
     ```
 
+1. And one last group that will include `ALL` our devices.  
+
+    ```
+    devices device-group ALL
+    device-group ASA-DEVICES
+    device-group IOS-DEVICES
+    device-group NXOS-DEVICES 
+    ```
+
 1. And now `commit` them to save the changes.  
 
     ```
