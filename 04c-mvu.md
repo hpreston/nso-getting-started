@@ -8,7 +8,7 @@ We would like to ensure that the following network features are configured as de
 * Syslog server configuration 
 * NTP configuration
 
-> Note: The techinque used in this example could be extended to any aspect of the configuration.  For this demonstration we scoped it down to a set of features. 
+> Note: The technique used in this example could be extended to any aspect of the configuration.  For this demonstration we scoped it down to a set of features. 
 
 ## Cisco NSO Features Used 
 * Device templates 
@@ -229,6 +229,8 @@ Everything we need is ready for us to test the network for compliance.
 
 1. In the `Details` section, you'll find a device by device breakdown of what the problems are.  This is shown in a `diff` format, where lines with a `+` indicate missing configuration.  If there were configurations on the devices that should **not** be there, they'd be indicated with `-`. 
 
+    > Note: Even though there are different CLI device types being evaluated (IOS, NX, ASA), NSO standardizes the "native" configuration into a uniform data model, in Junos curly-bracket style, when showing the diff. 
+
     ```diff
     Device dmz-rtr02-1
 
@@ -358,20 +360,20 @@ An obvious next step after running a compliance report would be to resolve any p
     ```
     </details>
 
-1. If you'd like to see the proposed changes to the network. 
+1. Use these commands to see the proposed changes to the network to bring the devices in compliance using the "native" device-type CLI. 
 
     ```
     show configuration 
     commit dry-run outformat native
     ```
 
-1. Commit the configuration. 
+1. Commit the configuration, which will have NSO send the commands to the devices and make them compliant. 
 
     ```
     commit
     ```
 
-1. Exit config mode and re-run the compliance report. 
+1. Exit config mode and re-run the compliance report, so NSO verifies that what is on the device is in compliance with the defined template. 
 
     ```
     end
