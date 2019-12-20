@@ -1,6 +1,7 @@
 .virl/
 scratch*
 nso-network-prep/
+.vscode/
 
 # NSO
 logs/
