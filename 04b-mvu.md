@@ -11,7 +11,7 @@ Our goal is to retrieve the MAC address tables from our NX-OS and IOS switches.
 ## Building the Use Case 
 Device NEDs provide access to some operational data along with the configuration data.  The operational data available for a device is dependent on the NED, and not all NEDs support the same details.  
 
-But remember that even if a NED doesn't model out some operational data natively, you can still use NSO to gather operational details by sending `show` commands out to any connected device centrally and capturing the output. 
+But remember that even if a NED doesn't model out some operational data natively, you can still use NSO to gather operational details by sending `show` commands out to any connected device centrally and capturing the output. Once you have that output, you can then put it through other industry standard parsing engines to get structured data from the show command output (example: [TextFSM](https://github.com/networktocode/ntc-templates) or [Genie and others](https://operational.io/network-automation-text-parsing-landscape/) ). 
 
 ### Step 1: Nexus Devices 
 The `cisco-nx` NED models out the MAC address table, let's check it out. 
