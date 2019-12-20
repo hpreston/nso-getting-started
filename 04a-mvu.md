@@ -1,5 +1,5 @@
 # Minimum Viable Use Case: Update SNMP Configuration Across the Network
-My go-to example for a first network automation project has long been the updating of SNMP community strings.  Let's see how NSO can make it super easy. 
+My go-to example for a first network automation project has long been the updating of SNMP community strings because it is commonly used and has a limited blast radius if something goes wrong as you are learning.  Let's see how NSO can make it super easy. 
 
 ## Use Case Description 
 Our goal is to update the SNMP community string configuration on all our network devices.  This includes: 
@@ -14,7 +14,7 @@ Our goal is to update the SNMP community string configuration on all our network
 
 ## Building the Use Case 
 ### Step 1: Create the Template 
-1. Log into `ncs_cli` and enter `config` mode. 
+1. Log into NSO with `ncs_cli -C -u admin` and enter `config` mode. 
 
 1. Let's setup the device template that covers the three device-types in question.  
 
@@ -44,7 +44,7 @@ Our goal is to update the SNMP community string configuration on all our network
     exit
     ```
 
-    * NSO device templates can use variables for values to make them more dynamic and re-usable.
+    * NSO device templates can use variables for values to make them more dynamic and re-usable. The variable syntax is {$VAR_NAME}, though the variable name does not have to be in all caps, we do that to make it more readable. 
     * The syntax of the template configuration may differ slightly from what a native device CLI configuration is.  That is because the template is a bit more verbose of a representation of the NED data model.  
 
 1. Return to `top` and checkout the configuration with `show configuration`
@@ -57,8 +57,8 @@ Our goal is to update the SNMP community string configuration on all our network
 ### Step 2: Testing the Template 
 You always need to test your automation before pushing it out to the whole network. Let's verify that it works as expected on our three platforms.  
 
-1. First let's see what SNMP configuration exists on our test platforms. We'll do this from "enable" mode. 
-    > Note: From `config` mode you can use `show full-configuration` to look at the device configuraiton.  This will display both the `running-config` as well as any staged configuration.  
+1. First let's see what SNMP configuration exists on our test platforms. We'll do this from the NSO CLI "enable" mode. 
+    > Note: From `config` mode you can use `show full-configuration` to look at the device configuration.  This will display both the `running-config` as well as any staged configuration that NSO is planning on sending to the device.  
 
     ```
     ! "end" will exit config mode
@@ -85,7 +85,7 @@ You always need to test your automation before pushing it out to the whole netwo
     </details>
 
 1. Next up, let's test it on these three devices.  
-
+    > Note: The syntax to input the variable values for a particular device is `devices device DEVICE-NAME apply-template template-name TEMPLATE-NAME variable { name VARIABLE-NAME1 value 'value-in-template1' } variable { name VARIABLE-NAME2 value 'value-in-template2' }`. 
     ```
     config 
 
@@ -120,7 +120,9 @@ You always need to test your automation before pushing it out to the whole netwo
     ```
     </details>
 
-1. See the resulting configuration to be applied with our favorite tools.  
+1. Now that NSO has the template applied with variable values defined, it can compare the intended configuration from the template to the actual configuration stored in the NSO CDB, and calculate what configuration needs to be sent to make the device be in compliance. Since there is no pre-existing SNMP configuration, all the commands would be sent, but in a brownfield network device, it would send only the minimal amount of commands needed. 
+
+To view the resulting pending configuration to be applied from the templates use the following command:  
 
     ```
     show configuration 
@@ -175,11 +177,14 @@ You always need to test your automation before pushing it out to the whole netwo
     ```
     </details>
 
-1. It all looks good, let's save it. 
+1. It all looks good, let's commit it, so NSO will apply the pending configuration to the devices. 
 
     ```
     commit
     ```
+
+
+### Step 3: Deeper Testing and a Reference to a Classic Dinosaur Movie
 
 1. Now the goal of this use case is to replace/update the community string.  Let's see what happens when we run the templates again to change the string. 
 
@@ -191,7 +196,6 @@ You always need to test your automation before pushing it out to the whole netwo
     devices device fw01 apply-template template-name UPDATE-SNMP-COMMUNITY variable { name READ_ONLY_COMMUNITY value 'READ_2' } variable { name READ_WRITE_COMMUNITY value 'WRITE_2' }
     ```
 
-### Step 3: Deeper Testing and a Reference to a Classic Dinosaur Movie
 > **IMPORTANT PART** - Let's spend a bit of time exploring what's going on to uncover a big challenge with many network automation projects.  Something I like to call the "Unexpected Raptors Problem". 
 
 1. Let's look at our normal verification before committing.  
@@ -221,7 +225,7 @@ You always need to test your automation before pushing it out to the whole netwo
     ```
     </details>
 
-1. This looks like exactly what we'd want.  But let's dig a bit deeper and look at the `full-configuration` for these devices. 
+1. This looks like exactly what we'd want.  But let's dig a bit deeper and look at the `full-configuration` for these devices (for just the `snmp-server` part of the device). 
 
     ```
     show full-configuration devices device dmz-rtr02-1 config snmp-server
@@ -263,7 +267,7 @@ You always need to test your automation before pushing it out to the whole netwo
     ```
     </details>
 
-    > Well look at that... the IOS and NX devices have both community strings, while the ASA only has the new one.  This is because communities on IOS and NX are lists, the devices support having many configured simultaneously, while ASA only supports one.  
+    > Well look at that... the IOS and NX devices have both community strings, while the ASA only has the new one.  This is because communities on IOS and NX are lists, the devices support having many configured simultaneously, while ASA only supports one. This is why it is important to test your configuration before deploying because different network OS platforms behave differently, even for similar configuration changes. 
 
 1. Go ahead and commit this change, and we'll tackle fixing this in our next step. 
 
@@ -315,7 +319,7 @@ In these cases, you can tell NSO to take one of the following alternative action
        snmp-server enable-conf enable true
     ```
 
-1. The different actions are used by leveraging `tags` attached to parts of the configuration.  A `tag` will apply to all sub-nodes from the point it is added.  The meaning of that makes far more sense when you look at the configuration in the XML format.  
+1. Within NSO templates, you can change the behavior of templates being applied by  leveraging `tags` attached to parts of the configuration. These can be tactical, for just one little portion of the configuration, or be applied to the whole template.  A `tag` will apply to all sub-nodes from the point it is added,.  The meaning of that makes far more sense when you look at the configuration in the XML format, since it is a hierarchical data format.  
 
     ```
     show full-configuration devices template UPDATE-SNMP-COMMUNITY | display xml
@@ -376,6 +380,8 @@ In these cases, you can tell NSO to take one of the following alternative action
     </config>
     ```
     </details>
+   
+    > Note: XML is a hierarchical language, with each opening tag (`<template>`) needing a closing tag (`</template>`). Indentation helps see the hierarchical relationships of XML, but the indentation does not affect the processing of XML.  
 
 1. What we want to do is `replace` everything within the `<snmp-server>` parts of the configuration.  Here's an example. 
 
@@ -396,7 +402,7 @@ In these cases, you can tell NSO to take one of the following alternative action
 
     > We want to replace **ALL** the communities within the `<snmp-server>` block.
 
-1. To do that, we'll `add` the `replace` tag to each of the `snmp-server` elements of the configuration. 
+1. To do that, we'll `add` the `replace` tag to each of the `snmp-server` elements of the configuration in the template. 
 
     ```
     devices template UPDATE-SNMP-COMMUNITY
@@ -462,7 +468,7 @@ In these cases, you can tell NSO to take one of the following alternative action
 
     > The tags make the display in CLI format a bit messy, but you can see where the new `Tags: replace` have been added.  What is shown is the XPATH to the point for the relevant tag.  XPATH is a navigation structure for XML. 
 
-1. If you look at the XML verison of the config, the placement of the tags is a bit easier to see and understand how they work. 
+1. If you look at the XML version of the config, the placement of the tags is a bit easier to see and understand how they work. In the following output look for the XML meta-data tag `tags=" replace "`. This indicates any existing device configuration below this level will be replaced when the template is applied, rather than the default action of merging configuration. 
 
     ```
     show full-configuration devices template UPDATE-SNMP-COMMUNITY | display xml
@@ -580,9 +586,9 @@ In these cases, you can tell NSO to take one of the following alternative action
     > Perfect.. you can see that NSO will remove the old raptors and just keep our good communities. 
 
 ## Executing the Use Case 
-With our template built and tested, let's put it to work across the network. 
+With our template built and tested, let's put it to work across the network. Rather than applying variable inputs per device, you can also apply templates to a group of devices. 
 
-1. We want to setup SNMP across the entire network, so we'll use the `ALL` group we setup.  
+1. We want to setup SNMP across the entire network, so we'll use the `ALL` group we setup. This would apply the appropriate template per device type, with the same variable inputs, across all the devices in the device-group.   
 
     ```
     devices device-group ALL apply-template template-name UPDATE-SNMP-COMMUNITY variable { name READ_ONLY_COMMUNITY value 'INITIAL_READ' } variable { name READ_WRITE_COMMUNITY value 'INITIAL_WRITE' }
@@ -674,7 +680,10 @@ With our template built and tested, let's put it to work across the network.
     ```
     </details>
 
-1. And checkout the configuration to be applied.  
+1. And now verify the pending configuration to be sent to the network devices. 
+
+
+    > Note: For devices which already have SNMP configuration, like `dmz-rtr02-1`, NSO applies the template to replace the configuration, removing existing SNMP lines. For devices which do not have any configuration to replace, no additional commands are sent.
 
     ```
     show configuration
@@ -817,7 +826,7 @@ With our template built and tested, let's put it to work across the network.
     commit
     ```
 
-1. And to make sure there aren't any raptors... 
+1. And to make sure there aren't any raptors...we test with a new set of inputs to make sure the templates behave as expected. 
 
     ```
     devices device-group ALL apply-template template-name UPDATE-SNMP-COMMUNITY variable { name READ_ONLY_COMMUNITY value 'NEW_READ' } variable { name READ_WRITE_COMMUNITY value 'NEW_WRITE' }
