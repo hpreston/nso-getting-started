@@ -2,6 +2,7 @@
 scratch*
 nso-network-prep/
 .vscode/
+*.code-workspace
 
 # NSO
 logs/
