@@ -1,7 +1,7 @@
 # Connecting to the Network for the First Time 
 You've now got NSO installed and you are ready to dive in and use it on your network, but what network?  
 
-If you have a lab ready to go, feel free to use that - but we've included a [VIRL topology file](topology.virl) with this lab that we will use for our examples.  Feel free to fire ,up your own instance of this VIRL network either using your own VIRL server, or go reserve one from [DevNet Sandbox - Multi-IOS Test Network](https://devnetsandbox.cisco.com/RM/Diagram/Index/6b023525-4e7f-4755-81ae-05ac500d464a?diagramType=Topology)
+If you have a lab ready to go, feel free to use that - but we've included a [VIRL topology file](topology.virl) with this lab that we will use for our examples.  Feel free to fire, up your own instance of this VIRL network either using your own VIRL server, or go reserve one from [DevNet Sandbox - Multi-IOS Test Network](https://devnetsandbox.cisco.com/RM/Diagram/Index/6b023525-4e7f-4755-81ae-05ac500d464a?diagramType=Topology)
 
 <a href="example-network.jpg" target="_blank">![](example-network-sm.jpeg)</a>
 
@@ -79,6 +79,164 @@ If you have a lab ready to go, feel free to use that - but we've included a [VIR
 
 </details>
 
+## Starting the sample VIRL Network
+Follow these steps to start the sample network. 
+
+1. Reserve an instance of [DevNet Sandbox - Multi-IOS Test Network](https://devnetsandbox.cisco.com/RM/Diagram/Index/6b023525-4e7f-4755-81ae-05ac500d464a?diagramType=Topology). Pick **None** as the `Virl Simulation` before reserving.  This will start the lab with NO topology loaded in VIRL, we'll be starting our own. 
+
+    ![](sbx-reserve-1.jpg)
+
+    > It will take about 10 minutes for the lab to fully spin up.  
+
+1. Once your lab is ready, use the VPN credentials you recieve via email, or find in the **OUTPUT** box in the Sandbox portal to connect to your lab. 
+1. If you haven't already, clone down this repository to your local workstation. 
+
+    ```bash
+    git clone https://github.com/hpreston/nso-getting-started.git
+    ```
+
+1. Change into the code repository directory. 
+
+    ```bash
+    cd nso-getting-started
+    ```
+
+1. We will use the Python package `virlutils` to start the lab.  If you don't have it installed already, go ahead and do so now. 
+
+    > Note: This guide assumes a basic knowledge of Python and doesn't explicitly state to use a virtual environment, or a version of Python to use.  Any recent version of Python and common working environment should work. 
+
+    ```bash
+    pip install virlutils
+    ```
+
+1. Verify that your lab and virlutils is working.
+
+    ```bash
+    # Check what version of VIRL is loaded (verify you can talk to server)
+    virl version
+
+    # Check if any simulations are running
+    virl ls --all
+    ```
+
+    <details><summary>Output</summary>
+
+    ```
+    $virl version
+    virlutils Version: 0.8.8
+    VIRL Core Version: 0.10.37.32
+    
+    $ virl ls --all
+    Running Simulations
+    ╒══════════════╤══════════╤════════════════════════════╤═══════════╕
+    │ Simulation   │ Status   │ Launched                   │ Expires   │
+    ╞══════════════╪══════════╪════════════════════════════╪═══════════╡
+    │ ~jumphost    │ ACTIVE   │ 2019-12-15T16:27:42.567768 │           │
+    ╘══════════════╧══════════╧════════════════════════════╧═══════════╛
+    ```
+
+    </details>
+
+
+    * If any simulation other than `~jumphost` is running, stop it with the following command. 
+
+        ```bash
+        virl down --sim-name {SIMULATION_NAME}
+        ```
+
+1. Start a simulation for this lab. 
+
+    ```bash
+    virl up
+    ```
+
+    <details><summary>Output</summary>
+
+    ```
+    Creating default environment from topology.virl
+    ```
+
+    </details>
+
+1. It will take several minutes for the simulation to fully start, you can monitor it with the following command - waiting for all devices to show `REACHABLE`
+
+    ```bash
+    virl nodes
+    ```
+
+    <details><summary>Devices Details</summary>
+
+    ```bash
+    ╒═══════════════════╤═════════════╤═════════╤═════════════╤════════════╤══════════════════════╤════════════════════╕
+    │ Node              │ Type        │ State   │ Reachable   │ Protocol   │ Management Address   │ External Address   │
+    ╞═══════════════════╪═════════════╪═════════╪═════════════╪════════════╪══════════════════════╪════════════════════╡
+    │ admin-mgmt01      │ server      │ ACTIVE  │ REACHABLE   │ ssh        │ 172.16.30.167        │ N/A                │
+    ├───────────────────┼─────────────┼─────────┼─────────────┼────────────┼──────────────────────┼────────────────────┤
+    │ admin-systems01   │ server      │ ACTIVE  │ REACHABLE   │ ssh        │ 172.16.30.151        │ N/A                │
+    ├───────────────────┼─────────────┼─────────┼─────────────┼────────────┼──────────────────────┼────────────────────┤
+    │ dev-app01         │ server      │ ACTIVE  │ REACHABLE   │ ssh        │ 172.16.30.154        │ N/A                │
+    ├───────────────────┼─────────────┼─────────┼─────────────┼────────────┼──────────────────────┼────────────────────┤
+    │ dev-data01        │ server      │ ACTIVE  │ REACHABLE   │ ssh        │ 172.16.30.153        │ N/A                │
+    ├───────────────────┼─────────────┼─────────┼─────────────┼────────────┼──────────────────────┼────────────────────┤
+    │ dev-web01         │ server      │ ACTIVE  │ REACHABLE   │ ssh        │ 172.16.30.161        │ N/A                │
+    ├───────────────────┼─────────────┼─────────┼─────────────┼────────────┼──────────────────────┼────────────────────┤
+    │ dmz-fw01-1        │ ASAv        │ ACTIVE  │ REACHABLE   │ telnet     │ 172.16.30.133        │ N/A                │
+    ├───────────────────┼─────────────┼─────────┼─────────────┼────────────┼──────────────────────┼────────────────────┤
+    │ dmz-rtr02-1       │ CSR1000v    │ ACTIVE  │ REACHABLE   │ telnet     │ 172.16.30.135        │ N/A                │
+    ├───────────────────┼─────────────┼─────────┼─────────────┼────────────┼──────────────────────┼────────────────────┤
+    │ dmz-rtr02-2       │ CSR1000v    │ ACTIVE  │ REACHABLE   │ telnet     │ 172.16.30.136        │ N/A                │
+    ├───────────────────┼─────────────┼─────────┼─────────────┼────────────┼──────────────────────┼────────────────────┤
+    │ dmz-sw01-1        │ NX-OSv 9000 │ ACTIVE  │ REACHABLE   │ telnet     │ 172.16.30.107        │ N/A                │
+    ├───────────────────┼─────────────┼─────────┼─────────────┼────────────┼──────────────────────┼────────────────────┤
+    │ dmz-sw01-2        │ NX-OSv 9000 │ ACTIVE  │ REACHABLE   │ telnet     │ 172.16.30.108        │ N/A                │
+    ├───────────────────┼─────────────┼─────────┼─────────────┼────────────┼──────────────────────┼────────────────────┤
+    │ dmz-sw02-1        │ NX-OSv 9000 │ ACTIVE  │ REACHABLE   │ telnet     │ 172.16.30.109        │ N/A                │
+    ├───────────────────┼─────────────┼─────────┼─────────────┼────────────┼──────────────────────┼────────────────────┤
+    │ dmz-sw02-2        │ NX-OSv 9000 │ ACTIVE  │ REACHABLE   │ telnet     │ 172.16.30.110        │ N/A                │
+    ├───────────────────┼─────────────┼─────────┼─────────────┼────────────┼──────────────────────┼────────────────────┤
+    │ fw-inside-sw01    │ IOSvL2      │ ACTIVE  │ REACHABLE   │ telnet     │ 172.16.30.122        │ N/A                │
+    ├───────────────────┼─────────────┼─────────┼─────────────┼────────────┼──────────────────────┼────────────────────┤
+    │ fw-outside-sw01   │ IOSvL2      │ ACTIVE  │ REACHABLE   │ telnet     │ 172.16.30.123        │ N/A                │
+    ├───────────────────┼─────────────┼─────────┼─────────────┼────────────┼──────────────────────┼────────────────────┤
+    │ fw01              │ ASAv        │ ACTIVE  │ REACHABLE   │ telnet     │ 172.16.30.145        │ N/A                │
+    ├───────────────────┼─────────────┼─────────┼─────────────┼────────────┼──────────────────────┼────────────────────┤
+    │ fw02              │ ASAv        │ ACTIVE  │ REACHABLE   │ telnet     │ 172.16.30.146        │ N/A                │
+    ├───────────────────┼─────────────┼─────────┼─────────────┼────────────┼──────────────────────┼────────────────────┤
+    │ guest-01          │ server      │ ACTIVE  │ REACHABLE   │ ssh        │ 172.16.30.164        │ N/A                │
+    ├───────────────────┼─────────────┼─────────┼─────────────┼────────────┼──────────────────────┼────────────────────┤
+    │ internet-rtr      │ CSR1000v    │ ACTIVE  │ REACHABLE   │ telnet     │ 172.16.30.171        │ N/A                │
+    ├───────────────────┼─────────────┼─────────┼─────────────┼────────────┼──────────────────────┼────────────────────┤
+    │ internet-server01 │ server      │ ACTIVE  │ REACHABLE   │ ssh        │ 172.16.30.175        │ N/A                │
+    ├───────────────────┼─────────────┼─────────┼─────────────┼────────────┼──────────────────────┼────────────────────┤
+    │ internet-server02 │ server      │ ACTIVE  │ REACHABLE   │ ssh        │ 172.16.30.176        │ N/A                │
+    ├───────────────────┼─────────────┼─────────┼─────────────┼────────────┼──────────────────────┼────────────────────┤
+    │ leaf01-1          │ NX-OSv 9000 │ ACTIVE  │ REACHABLE   │ telnet     │ 172.16.30.103        │ N/A                │
+    ├───────────────────┼─────────────┼─────────┼─────────────┼────────────┼──────────────────────┼────────────────────┤
+    │ leaf01-2          │ NX-OSv 9000 │ ACTIVE  │ REACHABLE   │ telnet     │ 172.16.30.104        │ N/A                │
+    ├───────────────────┼─────────────┼─────────┼─────────────┼────────────┼──────────────────────┼────────────────────┤
+    │ leaf02-1          │ NX-OSv 9000 │ ACTIVE  │ REACHABLE   │ telnet     │ 172.16.30.105        │ N/A                │
+    ├───────────────────┼─────────────┼─────────┼─────────────┼────────────┼──────────────────────┼────────────────────┤
+    │ leaf02-2          │ NX-OSv 9000 │ ACTIVE  │ REACHABLE   │ telnet     │ 172.16.30.106        │ N/A                │
+    ├───────────────────┼─────────────┼─────────┼─────────────┼────────────┼──────────────────────┼────────────────────┤
+    │ prod-app01        │ server      │ ACTIVE  │ REACHABLE   │ ssh        │ 172.16.30.155        │ N/A                │
+    ├───────────────────┼─────────────┼─────────┼─────────────┼────────────┼──────────────────────┼────────────────────┤
+    │ prod-data01       │ server      │ ACTIVE  │ REACHABLE   │ ssh        │ 172.16.30.162        │ N/A                │
+    ├───────────────────┼─────────────┼─────────┼─────────────┼────────────┼──────────────────────┼────────────────────┤
+    │ prod-web01        │ server      │ ACTIVE  │ REACHABLE   │ ssh        │ 172.16.30.152        │ N/A                │
+    ├───────────────────┼─────────────┼─────────┼─────────────┼────────────┼──────────────────────┼────────────────────┤
+    │ spine01-1         │ NX-OSv 9000 │ ACTIVE  │ REACHABLE   │ telnet     │ 172.16.30.101        │ N/A                │
+    ├───────────────────┼─────────────┼─────────┼─────────────┼────────────┼──────────────────────┼────────────────────┤
+    │ spine01-2         │ NX-OSv 9000 │ ACTIVE  │ REACHABLE   │ telnet     │ 172.16.30.102        │ N/A                │
+    ├───────────────────┼─────────────┼─────────┼─────────────┼────────────┼──────────────────────┼────────────────────┤
+    │ vm-sw01           │ IOSvL2      │ ACTIVE  │ REACHABLE   │ telnet     │ 172.16.30.121        │ N/A                │
+    ├───────────────────┼─────────────┼─────────┼─────────────┼────────────┼──────────────────────┼────────────────────┤
+    │ vm-sw02           │ IOSvL2      │ ACTIVE  │ REACHABLE   │ telnet     │ 172.16.30.115        │ N/A                │
+    ╘═══════════════════╧═════════════╧═════════╧═════════════╧════════════╧══════════════════════╧════════════════════╛
+    ```
+
+    </details>
+
+
 ## Setting up and Starting NSO
 As you learned during the installation step, a Local Install unpacks and prepares your system to run NSO, but doesn't actually start it up.  A Local Install allows the engineer to create an NSO "instance" tied to a project.  If you've done much work with Python, you can think of this like creating a Python virtual environment after installing Python.  Within this NSO instance, you will have different inventory, configuration, and code.  
 
@@ -111,6 +269,12 @@ As you learned during the installation step, a Local Install unpacks and prepare
     * `logs/` - this directory contains all the logs from NSO.  When troubleshooting, this is a handy directory. 
 
 1. Last step is to "start" NSO.  Simply type the command `ncs`.  It will take a few seconds to run - and you won't get any explicit output unless there is a problem. 
+
+    ```bash
+    ncs
+    ```
+
+
 1. Jump into your NSO instance using the `ncs_cli` command.  This command takes several options - we'll use `-C` to specify we'd like a "Cisco style" command line interface (the default is a Juniper style), and `-u admin` to login as the "admin" user. 
 
     ```bash
