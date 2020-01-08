@@ -13,6 +13,7 @@ These labs will help you go from zero to NSO hero.
 1. [Learn how to install NSO](01-installing-nso.md)
 1. [Connect NSO to your network](02-connecting-to-network.md)
 1. [Explore the NSO CLI](03-exploring-with-cli.md)
+1. [Cleaning Up Your Environment](99-cleanup.md)
 
 ## Minimum Viable Use Cases
 Here are a few example real-world use cases that every network engineer can relate to solved with NSO. 
