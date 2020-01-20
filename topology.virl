@@ -9,83 +9,221 @@
             <entry key="AutoNetkit.ASN" type="Integer">1</entry>
             <entry key="static_ip" type="String">172.16.30.121</entry>
             <entry key="config" type="String">!
-    !
-    version 15.2
-    service timestamps debug datetime msec
-    service timestamps log datetime msec
-    no service password-encryption
-    service compress-config
-    no service config
-    enable password cisco
-    ip classless
-    ip subnet-zero
-    no ip domain lookup
-    username cisco privilege 15 secret cisco
-    !
-    line vty 0 4
-    transport input ssh telnet
-    exec-timeout 720 0
-    password cisco
-    login local
-    !
-    line con 0
-    password cisco
-    !
-    hostname vm-sw01
-    !
-    boot-start-marker
-    boot-end-marker
-    !
-    !
-    !
-    no aaa new-model
-    !
-    vtp mode transparent
-    !
-    cdp run
-    !
-    ip cef
-    no ipv6 cef
-    !
-    !
-    spanning-tree mode rapid-pvst
-    spanning-tree extend system-id
-    !
-    vlan internal allocation policy ascending
-    !
-    !
-    !
-    !
-    vrf definition Mgmt-intf
-    !
-    address-family ipv4
-    exit-address-family
-    !
-    address-family ipv6
-    exit-address-family
-    !
-    !
-    interface GigabitEthernet0/0
-    description OOB management
-    ! Configured on launch
-    no switchport
-    vrf forwarding Mgmt-intf
-    no ip address
-    no shutdown
-    !
-    !
-    ip forward-protocol nd
-    !
-    no ip http server
-    no ip http secure-server
-    !
-    control-plane
-    !
-    ip route vrf Mgmt-intf 0.0.0.0 0.0.0.0 172.16.30.254
-    ip domain-name lab.intra
-    crypto key generate rsa general-keys modulus 1024    
-    end
-          </entry>
+! Last configuration change at 16:42:46 UTC Mon Jan 20 2020 by cisco
+!
+version 15.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+service compress-config
+!
+hostname vm-sw01
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition Mgmt-intf
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+enable password cisco
+!
+username cisco privilege 15 secret 5 $1$WCVB$8jS.tN8k2ihwiXMpipnq//
+no aaa new-model
+!
+!
+!
+!
+!
+vtp mode transparent
+!
+!
+!
+no ip domain-lookup
+ip domain-name lab.intra
+ip cef
+no ipv6 cef
+!
+!
+!
+spanning-tree mode rapid-pvst
+spanning-tree extend system-id
+!
+!
+vlan 10
+ name trusted-transit
+!
+vlan 11
+ name admin-systems
+!
+vlan 12
+ name mgmt
+!
+vlan 100
+ name dmz-transit
+!
+vlan 101
+ name prod-web
+!
+vlan 102
+ name prod-app
+!
+vlan 103
+ name prod-data
+!
+vlan 201
+ name dev-web
+!
+vlan 202
+ name dev-app
+!
+vlan 203
+ name dev-data
+!
+vlan 900
+ name guest-transit
+!
+vlan 901
+ name hotspot
+!
+vlan 3001
+ name backdoor-temp
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Port-channel2
+ description Interswitch Fabric Link
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+interface GigabitEthernet0/0
+ description OOB management
+ no switchport
+ vrf forwarding Mgmt-intf
+ ip address 172.16.30.121 255.255.255.0
+ negotiation auto
+!
+interface GigabitEthernet0/1
+ description Interswitch Fabric Link
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ no negotiation auto
+ channel-group 2 mode active
+!
+interface GigabitEthernet0/2
+ description Interswitch Fabric Link
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ no negotiation auto
+ channel-group 2 mode active
+!
+interface GigabitEthernet0/3
+ description admin-systems01
+ switchport access vlan 11
+ switchport trunk encapsulation dot1q
+ switchport mode access
+ no negotiation auto
+!
+interface GigabitEthernet1/0
+ description prod-web01
+ switchport access vlan 101
+ switchport trunk encapsulation dot1q
+ switchport mode access
+ no negotiation auto
+!
+interface GigabitEthernet1/1
+ description dev-data01
+ switchport access vlan 203
+ switchport trunk encapsulation dot1q
+ switchport mode access
+ no negotiation auto
+!
+interface GigabitEthernet1/2
+ description dev-app01
+ switchport access vlan 202
+ switchport trunk encapsulation dot1q
+ switchport mode access
+ no negotiation auto
+!
+interface GigabitEthernet1/3
+ description prod-app01
+ switchport access vlan 102
+ switchport trunk encapsulation dot1q
+ switchport mode access
+ no negotiation auto
+!
+ip forward-protocol nd
+!
+no ip http server
+!
+ip route vrf Mgmt-intf 0.0.0.0 0.0.0.0 172.16.30.254
+ip ssh server algorithm encryption aes128-ctr aes192-ctr aes256-ctr
+ip ssh client algorithm encryption aes128-ctr aes192-ctr aes256-ctr
+!
+!
+!
+!
+!
+!
+control-plane
+!
+banner exec `
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************`
+banner incoming `
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************`
+banner login `
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************`
+!
+line con 0
+ password cisco
+line aux 0
+line vty 0 4
+ exec-timeout 720 0
+ password cisco
+ login local
+ transport input telnet ssh
+!
+!
+end
+
+</entry>
         </extensions>
         <interface id="0" name="GigabitEthernet0/1"/>
         <interface id="1" name="GigabitEthernet0/2"/>
@@ -99,51 +237,22 @@
         <extensions>
             <entry key="static_ip" type="String">172.16.30.133</entry>
             <entry key="config" type="string">!
+ASA Version 9.9(2) 
 !
+terminal width 511
 hostname dmz-fw01-1
-terminal width 0
-username cisco password cisco privilege 15
-enable password cisco
+enable password $sha512$5000$GfxfbsaSr5HwKVRE2cKGnA==$kJ+rBGXLeKPNke9keKH3Ew== pbkdf2
+!
+license smart
+ feature tier standard
+ throughput level 1G
 names
-interface Management0/0
-description OOB Management
-duplex full
-management-only
-nameif mgmt
-security-level 100
-no shutdown
-! Configured on launch
-no ip address
-!
-access-list global_access line 1 remark Allow Ping
-  access-list global_access line 2 extended permit icmp any any
-access-group global_access global
-route mgmt 0.0.0.0 0.0.0.0 172.16.30.254
-!
-aaa authentication ssh console LOCAL
-aaa authentication telnet console LOCAL
-aaa authorization exec LOCAL auto-enable
-http server enable
-http 0.0.0.0 0.0.0.0 mgmt
-ssh 0.0.0.0 0.0.0.0 mgmt
-telnet 0.0.0.0 0.0.0.0 mgmt
-http 0.0.0.0 0.0.0.0 outside
-ssh 0.0.0.0 0.0.0.0 outside
-telnet 0.0.0.0 0.0.0.0 outside
-http 0.0.0.0 0.0.0.0 outside-1
-ssh 0.0.0.0 0.0.0.0 outside-1
-telnet 0.0.0.0 0.0.0.0 outside-1
-ssh version 2
-crypto key generate rsa modulus 1024
-telnet timeout 15
-console timeout 0
 
 !
 interface GigabitEthernet0/0
- shutdown
- no nameif
- no security-level
- no ip address
+ nameif outside
+ security-level 0
+ ip address 10.225.71.2 255.255.255.248 
 !
 interface GigabitEthernet0/1
  shutdown
@@ -152,10 +261,15 @@ interface GigabitEthernet0/1
  no ip address
 !
 interface GigabitEthernet0/2
- shutdown
  no nameif
  no security-level
  no ip address
+!
+interface GigabitEthernet0/2.10
+ vlan 10
+ nameif inside
+ security-level 100
+ ip address 10.225.250.20 255.255.255.248 
 !
 interface GigabitEthernet0/3
  shutdown
@@ -169,14 +283,58 @@ interface GigabitEthernet0/4
  no security-level
  no ip address
 !
+interface Management0/0
+ description OOB Management
+ duplex full
+ management-only
+ nameif mgmt
+ security-level 100
+ ip address 172.16.30.133 255.255.255.0 
+!
 ftp mode passive
+dns domain-lookup mgmt
+dns server-group DefaultDNS
+ name-server 208.67.220.220 
+ name-server 208.67.222.222 
+object network PRIVATE-IP-CLASSA
+ subnet 10.0.0.0 255.0.0.0
+object network PRIVATE-IP-CLASSB
+ subnet 172.16.0.0 255.240.0.0
+object network PRIVATE-IP-CLASSC
+ subnet 192.168.0.0 255.255.0.0
+object network SITE-PUBLIC-IP-NETWORK
+ subnet 10.225.64.0 255.255.255.0
+object-group network PRIVATE-IPS
+ network-object object PRIVATE-IP-CLASSA
+ network-object object PRIVATE-IP-CLASSB
+ network-object object PRIVATE-IP-CLASSC
+access-list global_access remark Allow Ping
+access-list global_access extended permit icmp any4 any4 
+access-list inside_access_in extended permit ip object SITE-PUBLIC-IP-NETWORK any log disable 
+access-list inside_access_in extended deny ip object-group PRIVATE-IPS any log disable 
+access-list outside_access_in extended permit ip any object SITE-PUBLIC-IP-NETWORK log disable 
 pager lines 23
+mtu mgmt 1500
+mtu outside 1500
+mtu inside 1500
 no failover
+no monitor-interface inside
+no monitor-interface service-module 
 icmp unreachable rate-limit 1 burst-size 1
 no asdm history enable
 arp timeout 14400
 no arp permit-nonconnected
 arp rate-limit 8192
+access-group outside_access_in in interface outside
+access-group inside_access_in in interface inside
+access-group global_access global
+router ospf 1
+ network 10.225.250.0 255.255.255.0 area 0
+ redistribute static
+!
+route mgmt 0.0.0.0 0.0.0.0 172.16.30.254 1
+route outside 10.225.64.0 255.255.240.0 10.225.71.3 1
+route inside 10.225.64.0 255.255.255.0 10.225.250.18 1
 timeout xlate 3:00:00
 timeout pat-xlate 0:00:30
 timeout conn 1:00:00 half-closed 0:10:00 udp 0:02:00 sctp 0:02:00 icmp 0:00:02
@@ -188,7 +346,13 @@ timeout floating-conn 0:00:00
 timeout conn-holddown 0:00:15
 timeout igp stale-route 0:01:10
 user-identity default-domain LOCAL
+aaa authentication ssh console LOCAL 
+aaa authentication telnet console LOCAL 
+aaa authorization exec LOCAL auto-enable
+aaa authorization http console LOCAL
 aaa authentication login-history
+http server enable
+http 0.0.0.0 0.0.0.0 mgmt
 no snmp-server location
 no snmp-server contact
 crypto ipsec security-association pmtu-aging infinite
@@ -199,51 +363,53 @@ crypto ca trustpool policy
  auto-import
 crypto ca certificate chain _SmartCallHome_ServerCA
  certificate ca 513fb9743870b73440418d30930699ff
-    30820538 30820420 a0030201 02021051 3fb97438 70b73440 418d3093 0699ff30
-    0d06092a 864886f7 0d01010b 05003081 ca310b30 09060355 04061302 55533117
-    30150603 55040a13 0e566572 69536967 6e2c2049 6e632e31 1f301d06 0355040b
-    13165665 72695369 676e2054 72757374 204e6574 776f726b 313a3038 06035504
-    0b133128 63292032 30303620 56657269 5369676e 2c20496e 632e202d 20466f72
-    20617574 686f7269 7a656420 75736520 6f6e6c79 31453043 06035504 03133c56
-    65726953 69676e20 436c6173 73203320 5075626c 69632050 72696d61 72792043
-    65727469 66696361 74696f6e 20417574 686f7269 7479202d 20473530 1e170d31
-    33313033 31303030 3030305a 170d3233 31303330 32333539 35395a30 7e310b30
-    09060355 04061302 5553311d 301b0603 55040a13 1453796d 616e7465 6320436f
-    72706f72 6174696f 6e311f30 1d060355 040b1316 53796d61 6e746563 20547275
-    7374204e 6574776f 726b312f 302d0603 55040313 2653796d 616e7465 6320436c
-    61737320 33205365 63757265 20536572 76657220 4341202d 20473430 82012230
-    0d06092a 864886f7 0d010101 05000382 010f0030 82010a02 82010100 b2d805ca
-    1c742db5 175639c5 4a520996 e84bd80c f1689f9a 422862c3 a530537e 5511825b
-    037a0d2f e17904c9 b4967719 81019459 f9bcf77a 9927822d b783dd5a 277fb203
-    7a9c5325 e9481f46 4fc89d29 f8be7956 f6f7fdd9 3a68da8b 4b823341 12c3c83c
-    ccd6967a 84211a22 04032717 8b1c6861 930f0e51 80331db4 b5ceeb7e d062acee
-    b37b0174 ef6935eb cad53da9 ee9798ca 8daa440e 25994a15 96a4ce6d 02541f2a
-    6a26e206 3a6348ac b44cd175 9350ff13 2fd6dae1 c618f59f c9255df3 003ade26
-    4db42909 cd0f3d23 6f164a81 16fbf283 10c3b8d6 d855323d f1bd0fbd 8c52954a
-    16977a52 2163752f 16f9c466 bef5b509 d8ff2700 cd447c6f 4b3fb0f7 02030100
-    01a38201 63308201 5f301206 03551d13 0101ff04 08300601 01ff0201 00303006
-    03551d1f 04293027 3025a023 a021861f 68747470 3a2f2f73 312e7379 6d63622e
-    636f6d2f 70636133 2d67352e 63726c30 0e060355 1d0f0101 ff040403 02010630
-    2f06082b 06010505 07010104 23302130 1f06082b 06010505 07300186 13687474
-    703a2f2f 73322e73 796d6362 2e636f6d 306b0603 551d2004 64306230 60060a60
-    86480186 f8450107 36305230 2606082b 06010505 07020116 1a687474 703a2f2f
-    7777772e 73796d61 7574682e 636f6d2f 63707330 2806082b 06010505 07020230
-    1c1a1a68 7474703a 2f2f7777 772e7379 6d617574 682e636f 6d2f7270 61302906
-    03551d11 04223020 a41e301c 311a3018 06035504 03131153 796d616e 74656350
-    4b492d31 2d353334 301d0603 551d0e04 1604145f 60cf6190 55df8443 148a602a
-    b2f57af4 4318ef30 1f060355 1d230418 30168014 7fd365a7 c2ddecbb f03009f3
-    4339fa02 af333133 300d0609 2a864886 f70d0101 0b050003 82010100 5e945649
-    dd8e2d65 f5c13651 b603e3da 9e7319f2 1f59ab58 7e6c2605 2cfa81d7 5c231722
-    2c3793f7 86ec85e6 b0a3fd1f e232a845 6fe1d9fb b9afd270 a0324265 bf84fe16
-    2a8f3fc5 a6d6a393 7d43e974 21913528 f463e92e edf7f55c 7f4b9ab5 20e90abd
-    e045100c 14949a5d a5e34b91 e8249b46 4065f422 72cd99f8 8811f5f3 7fe63382
-    e6a8c57e fed008e2 25580871 68e6cda2 e614de4e 52242dfd e5791353 e75e2f2d
-    4d1b6d40 15522bf7 87897812 816ed94d aa2d78d4 c22c3d08 5f87919e 1f0eb0de
-    30526486 89aa9d66 9c0e760c 80f274d8 2af8b83a ced7d60f 11be6bab 14f5bd41
+    30820538 30820420 a0030201 02021051 3fb97438 70b73440 418d3093 0699ff30 
+    0d06092a 864886f7 0d01010b 05003081 ca310b30 09060355 04061302 55533117 
+    30150603 55040a13 0e566572 69536967 6e2c2049 6e632e31 1f301d06 0355040b 
+    13165665 72695369 676e2054 72757374 204e6574 776f726b 313a3038 06035504 
+    0b133128 63292032 30303620 56657269 5369676e 2c20496e 632e202d 20466f72 
+    20617574 686f7269 7a656420 75736520 6f6e6c79 31453043 06035504 03133c56 
+    65726953 69676e20 436c6173 73203320 5075626c 69632050 72696d61 72792043 
+    65727469 66696361 74696f6e 20417574 686f7269 7479202d 20473530 1e170d31 
+    33313033 31303030 3030305a 170d3233 31303330 32333539 35395a30 7e310b30 
+    09060355 04061302 5553311d 301b0603 55040a13 1453796d 616e7465 6320436f 
+    72706f72 6174696f 6e311f30 1d060355 040b1316 53796d61 6e746563 20547275 
+    7374204e 6574776f 726b312f 302d0603 55040313 2653796d 616e7465 6320436c 
+    61737320 33205365 63757265 20536572 76657220 4341202d 20473430 82012230 
+    0d06092a 864886f7 0d010101 05000382 010f0030 82010a02 82010100 b2d805ca 
+    1c742db5 175639c5 4a520996 e84bd80c f1689f9a 422862c3 a530537e 5511825b 
+    037a0d2f e17904c9 b4967719 81019459 f9bcf77a 9927822d b783dd5a 277fb203 
+    7a9c5325 e9481f46 4fc89d29 f8be7956 f6f7fdd9 3a68da8b 4b823341 12c3c83c 
+    ccd6967a 84211a22 04032717 8b1c6861 930f0e51 80331db4 b5ceeb7e d062acee 
+    b37b0174 ef6935eb cad53da9 ee9798ca 8daa440e 25994a15 96a4ce6d 02541f2a 
+    6a26e206 3a6348ac b44cd175 9350ff13 2fd6dae1 c618f59f c9255df3 003ade26 
+    4db42909 cd0f3d23 6f164a81 16fbf283 10c3b8d6 d855323d f1bd0fbd 8c52954a 
+    16977a52 2163752f 16f9c466 bef5b509 d8ff2700 cd447c6f 4b3fb0f7 02030100 
+    01a38201 63308201 5f301206 03551d13 0101ff04 08300601 01ff0201 00303006 
+    03551d1f 04293027 3025a023 a021861f 68747470 3a2f2f73 312e7379 6d63622e 
+    636f6d2f 70636133 2d67352e 63726c30 0e060355 1d0f0101 ff040403 02010630 
+    2f06082b 06010505 07010104 23302130 1f06082b 06010505 07300186 13687474 
+    703a2f2f 73322e73 796d6362 2e636f6d 306b0603 551d2004 64306230 60060a60 
+    86480186 f8450107 36305230 2606082b 06010505 07020116 1a687474 703a2f2f 
+    7777772e 73796d61 7574682e 636f6d2f 63707330 2806082b 06010505 07020230 
+    1c1a1a68 7474703a 2f2f7777 772e7379 6d617574 682e636f 6d2f7270 61302906 
+    03551d11 04223020 a41e301c 311a3018 06035504 03131153 796d616e 74656350 
+    4b492d31 2d353334 301d0603 551d0e04 1604145f 60cf6190 55df8443 148a602a 
+    b2f57af4 4318ef30 1f060355 1d230418 30168014 7fd365a7 c2ddecbb f03009f3 
+    4339fa02 af333133 300d0609 2a864886 f70d0101 0b050003 82010100 5e945649 
+    dd8e2d65 f5c13651 b603e3da 9e7319f2 1f59ab58 7e6c2605 2cfa81d7 5c231722 
+    2c3793f7 86ec85e6 b0a3fd1f e232a845 6fe1d9fb b9afd270 a0324265 bf84fe16 
+    2a8f3fc5 a6d6a393 7d43e974 21913528 f463e92e edf7f55c 7f4b9ab5 20e90abd 
+    e045100c 14949a5d a5e34b91 e8249b46 4065f422 72cd99f8 8811f5f3 7fe63382 
+    e6a8c57e fed008e2 25580871 68e6cda2 e614de4e 52242dfd e5791353 e75e2f2d 
+    4d1b6d40 15522bf7 87897812 816ed94d aa2d78d4 c22c3d08 5f87919e 1f0eb0de 
+    30526486 89aa9d66 9c0e760c 80f274d8 2af8b83a ced7d60f 11be6bab 14f5bd41 
     a0226389 f1ba0f6f 2963662d 3fac8c72 c5fbc7e4 d40ff23b 4f8c29c7
   quit
+telnet 0.0.0.0 0.0.0.0 mgmt
 telnet timeout 5
 ssh stricthostkeycheck
+ssh 0.0.0.0 0.0.0.0 mgmt
 ssh timeout 5
 ssh version 2
 ssh key-exchange group dh-group14-sha1
@@ -253,6 +419,7 @@ threat-detection basic-threat
 threat-detection statistics access-list
 no threat-detection statistics tcp-intercept
 dynamic-access-policy-record DfltAccessPolicy
+username cisco password $sha512$5000$hJ2LrASKQLQiwGBIvF7j7g==$my/G/BLYnyQodh4YmQ02fA== pbkdf2 privilege 15
 !
 class-map inspection_default
  match default-inspection-traffic
@@ -265,21 +432,31 @@ policy-map type inspect dns preset_dns_map
   no tcp-inspection
 policy-map global_policy
  class inspection_default
-  inspect ip-options
-  inspect netbios
-  inspect rtsp
-  inspect sunrpc
-  inspect tftp
-  inspect xdmcp
-  inspect dns preset_dns_map
-  inspect ftp
-  inspect h323 h225
-  inspect h323 ras
-  inspect rsh
-  inspect esmtp
-  inspect sqlnet
-  inspect sip
-  inspect skinny
+  inspect ip-options 
+  inspect netbios 
+  inspect rtsp 
+  inspect sunrpc 
+  inspect tftp 
+  inspect xdmcp 
+  inspect dns preset_dns_map 
+  inspect ftp 
+  inspect h323 h225 
+  inspect h323 ras 
+  inspect rsh 
+  inspect esmtp 
+  inspect sqlnet 
+  inspect sip  
+  inspect skinny  
+policy-map type inspect dns migrated_dns_map_4
+ parameters
+  message-length maximum client auto
+  message-length maximum 512
+  no tcp-inspection
+policy-map type inspect dns migrated_dns_map_3
+ parameters
+  message-length maximum client auto
+  message-length maximum 512
+  no tcp-inspection
 policy-map type inspect dns migrated_dns_map_2
  parameters
   message-length maximum client auto
@@ -292,11 +469,9 @@ policy-map type inspect dns migrated_dns_map_1
   no tcp-inspection
 !
 service-policy global_policy global
-prompt hostname context
+prompt hostname context 
+call-home reporting anonymous
 call-home
- profile License
-  destination address http https://tools.cisco.com/its/service/oddce/services/DDCEService
-  destination transport-method http
  profile CiscoTAC-1
   no active
   destination address http https://tools.cisco.com/its/service/oddce/services/DDCEService
@@ -307,6 +482,9 @@ call-home
   subscribe-to-alert-group inventory periodic monthly
   subscribe-to-alert-group configuration periodic monthly
   subscribe-to-alert-group telemetry periodic daily
+ profile License
+  destination address http https://tools.cisco.com/its/service/oddce/services/DDCEService
+  destination transport-method http
 </entry>
             <entry key="AutoNetkit.ASN" type="Integer">1</entry>
         </extensions>
@@ -321,7 +499,7 @@ call-home
             <entry key="AutoNetkit.ASN" type="Integer">1</entry>
             <entry key="static_ip" type="String">172.16.30.135</entry>
             <entry key="config">!
-! Last configuration change at 19:32:37 UTC Wed Apr 17 2019
+! Last configuration change at 18:50:42 UTC Mon Jan 20 2020 by cisco
 !
 version 16.9
 service timestamps debug datetime msec
@@ -336,6 +514,15 @@ boot-start-marker
 boot-end-marker
 !
 !
+vrf definition Mgmt-intf
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+enable secret 5 $1$wub7$suUTWbK2BGrTlxNfV13kw1
 !
 no aaa new-model
 !
@@ -357,10 +544,10 @@ ip admission watch-list expiry-time 0
 !
 !
 subscriber templating
-!
-!
-!
-!
+! 
+! 
+! 
+! 
 !
 multilink bundle-name authenticated
 !
@@ -368,6 +555,15 @@ multilink bundle-name authenticated
 !
 !
 !
+crypto pki trustpoint TP-self-signed-1500637407
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-1500637407
+ revocation-check none
+ rsakeypair TP-self-signed-1500637407
+!
+!
+crypto pki certificate chain TP-self-signed-1500637407
+ certificate self-signed 01 nvram:IOS-Self-Sig#1.cer
 !
 !
 !
@@ -376,8 +572,7 @@ multilink bundle-name authenticated
 !
 !
 !
-!
-license udi pid CSR1000V sn 9M9E7XJIMCW
+license udi pid CSR1000V sn 9RD3JWOXHGP
 no license smart enable
 diagnostic bootup level minimal
 !
@@ -385,6 +580,7 @@ spanning-tree extend system-id
 !
 !
 !
+username cisco privilege 15 secret 5 $1$n62u$LvQVweVTMvZdTtHNUrYBH1
 !
 redundancy
 !
@@ -393,6 +589,7 @@ redundancy
 !
 !
 !
+! 
 !
 !
 !
@@ -405,60 +602,103 @@ redundancy
 !
 !
 !
+! 
+! 
 !
 !
+interface Port-channel1
+ description inside
+ no ip address
+ no negotiation auto
+ no mop enabled
+ no mop sysid
 !
-vrf definition Mgmt-intf
+interface Port-channel1.11
+ description outside-admin-fw
+ encapsulation dot1Q 11
+ ip address 10.225.250.10 255.255.255.248
+ ip nat inside
+ standby version 2
+ standby 1 ip 10.225.250.9
+ standby 1 priority 110
+ standby 1 preempt
 !
- address-family ipv4
- exit-address-family
- !
- address-family ipv6
- exit-address-family
+interface Port-channel2
+ description outside
+ no ip address
+ no negotiation auto
+ no mop enabled
+ no mop sysid
 !
+interface Port-channel2.10
+ description outside-dmz-rtr02
+ encapsulation dot1Q 10
+ ip address 10.225.250.18 255.255.255.248
+ ip nat outside
+ standby version 2
+ standby 1 ip 10.225.250.17
+ standby 1 priority 110
+ standby 1 preempt
 !
 interface GigabitEthernet1
-  description OOB Management
-  vrf forwarding Mgmt-intf
-  ! Configured on launch
-  no ip address
-  cdp enable
-  duplex full
-  speed auto
-  no shutdown
-!
-ip route vrf Mgmt-intf 0.0.0.0 0.0.0.0 172.16.30.254
-!
+ description OOB Management
+ vrf forwarding Mgmt-intf
+ ip address 172.16.30.135 255.255.255.0
+ negotiation auto
+ cdp enable
+ no mop enabled
+ no mop sysid
 !
 interface GigabitEthernet2
+ ip address 10.225.250.25 255.255.255.248
  negotiation auto
  no mop enabled
  no mop sysid
 !
 interface GigabitEthernet3
+ no ip address
  negotiation auto
  no mop enabled
  no mop sysid
+ channel-group 2 mode active
 !
 interface GigabitEthernet4
+ no ip address
  negotiation auto
  no mop enabled
  no mop sysid
+ channel-group 2 mode active
 !
 interface GigabitEthernet5
+ no ip address
  negotiation auto
  no mop enabled
  no mop sysid
+ channel-group 1 mode active
 !
 interface GigabitEthernet6
+ no ip address
  negotiation auto
  no mop enabled
  no mop sysid
+ channel-group 1 mode active
 !
+router ospf 1
+ no log-adjacency-changes
+ redistribute static subnets
+ network 10.225.240.0 0.0.7.255 area 0
+ network 10.225.250.0 0.0.0.255 area 0
+!
+ip nat inside source static 10.225.250.12 10.225.64.31 extendable
 ip forward-protocol nd
 no ip http server
+ip http authentication local
 ip http secure-server
 ip http client source-interface GigabitEthernet1
+ip route 0.0.0.0 0.0.0.0 10.225.250.20
+ip route 10.225.64.0 255.255.255.0 10.225.250.12
+ip route 10.225.64.0 255.255.255.224 10.225.250.12
+ip route vrf Mgmt-intf 0.0.0.0 0.0.0.0 172.16.30.254
 !
 !
 !
@@ -497,7 +737,7 @@ end
             <entry key="AutoNetkit.ASN" type="Integer">1</entry>
             <entry key="static_ip" type="String">172.16.30.136</entry>
             <entry key="config">!
-! Last configuration change at 19:32:36 UTC Wed Apr 17 2019
+! Last configuration change at 18:50:43 UTC Mon Jan 20 2020 by cisco
 !
 version 16.9
 service timestamps debug datetime msec
@@ -512,6 +752,15 @@ boot-start-marker
 boot-end-marker
 !
 !
+vrf definition Mgmt-intf
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+enable secret 5 $1$NfJZ$jOQYoj7f8jleki0MVya0g1
 !
 no aaa new-model
 !
@@ -533,10 +782,10 @@ ip admission watch-list expiry-time 0
 !
 !
 subscriber templating
-!
-!
-!
-!
+! 
+! 
+! 
+! 
 !
 multilink bundle-name authenticated
 !
@@ -544,6 +793,15 @@ multilink bundle-name authenticated
 !
 !
 !
+crypto pki trustpoint TP-self-signed-2051963062
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-2051963062
+ revocation-check none
+ rsakeypair TP-self-signed-2051963062
+!
+!
+crypto pki certificate chain TP-self-signed-2051963062
+ certificate self-signed 01 nvram:IOS-Self-Sig#1.cer
 !
 !
 !
@@ -552,8 +810,7 @@ multilink bundle-name authenticated
 !
 !
 !
-!
-license udi pid CSR1000V sn 9QPE808MPSK
+license udi pid CSR1000V sn 9TXFOZLMR0F
 no license smart enable
 diagnostic bootup level minimal
 !
@@ -561,6 +818,7 @@ spanning-tree extend system-id
 !
 !
 !
+username cisco privilege 15 secret 5 $1$EQ3W$.UzVgu.wBqKiKReiGq9rY0
 !
 redundancy
 !
@@ -569,6 +827,7 @@ redundancy
 !
 !
 !
+! 
 !
 !
 !
@@ -581,61 +840,103 @@ redundancy
 !
 !
 !
+! 
+! 
 !
 !
+interface Port-channel1
+ description inside
+ no ip address
+ no negotiation auto
+ no mop enabled
+ no mop sysid
 !
+interface Port-channel1.11
+ description outside-admin-fw
+ encapsulation dot1Q 11
+ ip address 10.225.250.11 255.255.255.248
+ ip nat inside
+ standby version 2
+ standby 1 ip 10.225.250.9
+ standby 1 priority 90
+ standby 1 preempt
 !
+interface Port-channel2
+ description outside
+ no ip address
+ no negotiation auto
+ no mop enabled
+ no mop sysid
 !
-vrf definition Mgmt-intf
-!
- address-family ipv4
- exit-address-family
- !
- address-family ipv6
- exit-address-family
-!
+interface Port-channel2.10
+ description transit-edge-fw
+ encapsulation dot1Q 10
+ ip address 10.225.250.19 255.255.255.248
+ ip nat outside
+ standby version 2
+ standby 1 ip 10.225.250.17
+ standby 1 priority 90
+ standby 1 preempt
 !
 interface GigabitEthernet1
-  description OOB Management
-  vrf forwarding Mgmt-intf
-  ! Configured on launch
-  no ip address
-  cdp enable
-  duplex full
-  speed auto
-  no shutdown
-!
-ip route vrf Mgmt-intf 0.0.0.0 0.0.0.0 172.16.30.254
+ description OOB Management
+ vrf forwarding Mgmt-intf
+ ip address 172.16.30.136 255.255.255.0
+ negotiation auto
+ cdp enable
+ no mop enabled
+ no mop sysid
 !
 interface GigabitEthernet2
+ ip address 10.225.250.26 255.255.255.248
  negotiation auto
  no mop enabled
  no mop sysid
 !
 interface GigabitEthernet3
+ no ip address
  negotiation auto
  no mop enabled
  no mop sysid
+ channel-group 2 mode active
 !
 interface GigabitEthernet4
+ no ip address
  negotiation auto
  no mop enabled
  no mop sysid
+ channel-group 2 mode active
 !
 interface GigabitEthernet5
+ no ip address
  negotiation auto
  no mop enabled
  no mop sysid
+ channel-group 1 mode active
 !
 interface GigabitEthernet6
+ no ip address
  negotiation auto
  no mop enabled
  no mop sysid
+ channel-group 1 mode active
 !
+router ospf 1
+ no log-adjacency-changes
+ redistribute static subnets
+ network 10.225.240.0 0.0.7.255 area 0
+ network 10.225.250.0 0.0.0.255 area 0
+!
+ip nat inside source static 10.225.250.12 10.225.64.31 extendable
 ip forward-protocol nd
 no ip http server
+ip http authentication local
 ip http secure-server
 ip http client source-interface GigabitEthernet1
+ip route 0.0.0.0 0.0.0.0 10.225.250.20
+ip route 10.225.64.0 255.255.255.0 10.225.250.12
+ip route 10.225.64.0 255.255.255.224 10.225.250.12
+ip route vrf Mgmt-intf 0.0.0.0 0.0.0.0 172.16.30.254
 !
 !
 !
@@ -674,43 +975,352 @@ end
             <entry key="AutoNetkit.ASN" type="Integer">1</entry>
             <entry key="static_ip" type="String">172.16.30.107</entry>
             <entry key="config">!Command: show running-config
+!Running configuration last done at: Mon Jan 20 18:53:55 2020
+!Time: Mon Jan 20 18:56:30 2020
+
+version 9.2(2) Bios:version  
 hostname dmz-sw01-1
-vdc nx id 1
+vdc dmz-sw01-1 id 1
   limit-resource vlan minimum 16 maximum 4094
   limit-resource vrf minimum 2 maximum 4096
-  limit-resource port-channel minimum 0 maximum 768
-  limit-resource u4route-mem minimum 96 maximum 96
-  limit-resource u6route-mem minimum 24 maximum 24
+  limit-resource port-channel minimum 0 maximum 511
+  limit-resource u4route-mem minimum 128 maximum 128
+  limit-resource u6route-mem minimum 96 maximum 96
   limit-resource m4route-mem minimum 58 maximum 58
   limit-resource m6route-mem minimum 8 maximum 8
 
 feature telnet
-feature ssh
+cfs eth distribute
+feature lacp
+feature vpc
 
 no password strength-check
-username admin password 5 $1$KuOSBsvW$Cy0TSD..gEBGBPjzpDgf51 role network-admin
-username cisco password 5 $1$Nk7ZkwH0$fyiRmMMfIheqE3BqvcL0C1 role network-operator
+username admin password 5 $1$KuOSBsvW$Cy0TSD..gEBGBPjzpDgf51  role network-admin
+username cisco password 5 $1$Nk7ZkwH0$fyiRmMMfIheqE3BqvcL0C1  role network-operator
 username cisco role network-admin
 no ip domain-lookup
+rmon event 1 description FATAL(1) owner PMON@FATAL
+rmon event 2 description CRITICAL(2) owner PMON@CRITICAL
+rmon event 3 description ERROR(3) owner PMON@ERROR
+rmon event 4 description WARNING(4) owner PMON@WARNING
+rmon event 5 description INFORMATION(5) owner PMON@INFO
 
-
-vlan 1
+vlan 1,10
+vlan 10
+  name outside-dmz-rtr02
 
 vrf context management
   ip route 0.0.0.0/0 172.16.30.254
-
 hardware forwarding unicast trace
+vpc domain 10
+  peer-switch
+  peer-keepalive destination 172.16.30.108 source 172.16.30.107
+  peer-gateway
+
+
+interface port-channel1
+  switchport mode trunk
+  spanning-tree port type network
+  vpc peer-link
+
+interface port-channel11
+  description to dmz-rtr02-1
+  switchport mode trunk
+  switchport trunk allowed vlan 10
+  mtu 9216
+  vpc 11
+
+interface port-channel12
+  description to dmz-rtr02-2
+  switchport mode trunk
+  switchport trunk allowed vlan 10
+  mtu 9216
+  vpc 12
+
+interface Ethernet1/1
+  description VPC Peer Link
+  switchport mode trunk
+  channel-group 1 mode active
+
+interface Ethernet1/2
+  description VPC Peer Link
+  switchport mode trunk
+  channel-group 1 mode active
+
+interface Ethernet1/3
+
+interface Ethernet1/4
+
+interface Ethernet1/5
+  description inside dmz-fw01-1
+  switchport mode trunk
+  switchport trunk allowed vlan 10
+  mtu 9216
+
+interface Ethernet1/6
+
+interface Ethernet1/7
+  description to dmz-rtr02-1
+  switchport mode trunk
+  switchport trunk allowed vlan 10
+  mtu 9216
+  channel-group 11 mode active
+
+interface Ethernet1/8
+  description to dmz-rtr02-2
+  switchport mode trunk
+  switchport trunk allowed vlan 10
+  mtu 9216
+  channel-group 12 mode active
+
+interface Ethernet1/9
+
+interface Ethernet1/10
+
+interface Ethernet1/11
+
+interface Ethernet1/12
+
+interface Ethernet1/13
+
+interface Ethernet1/14
+
+interface Ethernet1/15
+
+interface Ethernet1/16
+
+interface Ethernet1/17
+
+interface Ethernet1/18
+
+interface Ethernet1/19
+
+interface Ethernet1/20
+
+interface Ethernet1/21
+
+interface Ethernet1/22
+
+interface Ethernet1/23
+
+interface Ethernet1/24
+
+interface Ethernet1/25
+
+interface Ethernet1/26
+
+interface Ethernet1/27
+
+interface Ethernet1/28
+
+interface Ethernet1/29
+
+interface Ethernet1/30
+
+interface Ethernet1/31
+
+interface Ethernet1/32
+
+interface Ethernet1/33
+
+interface Ethernet1/34
+
+interface Ethernet1/35
+
+interface Ethernet1/36
+
+interface Ethernet1/37
+
+interface Ethernet1/38
+
+interface Ethernet1/39
+
+interface Ethernet1/40
+
+interface Ethernet1/41
+
+interface Ethernet1/42
+
+interface Ethernet1/43
+
+interface Ethernet1/44
+
+interface Ethernet1/45
+
+interface Ethernet1/46
+
+interface Ethernet1/47
+
+interface Ethernet1/48
+
+interface Ethernet1/49
+
+interface Ethernet1/50
+
+interface Ethernet1/51
+
+interface Ethernet1/52
+
+interface Ethernet1/53
+
+interface Ethernet1/54
+
+interface Ethernet1/55
+
+interface Ethernet1/56
+
+interface Ethernet1/57
+
+interface Ethernet1/58
+
+interface Ethernet1/59
+
+interface Ethernet1/60
+
+interface Ethernet1/61
+
+interface Ethernet1/62
+
+interface Ethernet1/63
+
+interface Ethernet1/64
+
+interface Ethernet1/65
+
+interface Ethernet1/66
+
+interface Ethernet1/67
+
+interface Ethernet1/68
+
+interface Ethernet1/69
+
+interface Ethernet1/70
+
+interface Ethernet1/71
+
+interface Ethernet1/72
+
+interface Ethernet1/73
+
+interface Ethernet1/74
+
+interface Ethernet1/75
+
+interface Ethernet1/76
+
+interface Ethernet1/77
+
+interface Ethernet1/78
+
+interface Ethernet1/79
+
+interface Ethernet1/80
+
+interface Ethernet1/81
+
+interface Ethernet1/82
+
+interface Ethernet1/83
+
+interface Ethernet1/84
+
+interface Ethernet1/85
+
+interface Ethernet1/86
+
+interface Ethernet1/87
+
+interface Ethernet1/88
+
+interface Ethernet1/89
+
+interface Ethernet1/90
+
+interface Ethernet1/91
+
+interface Ethernet1/92
+
+interface Ethernet1/93
+
+interface Ethernet1/94
+
+interface Ethernet1/95
+
+interface Ethernet1/96
+
+interface Ethernet1/97
+
+interface Ethernet1/98
+
+interface Ethernet1/99
+
+interface Ethernet1/100
+
+interface Ethernet1/101
+
+interface Ethernet1/102
+
+interface Ethernet1/103
+
+interface Ethernet1/104
+
+interface Ethernet1/105
+
+interface Ethernet1/106
+
+interface Ethernet1/107
+
+interface Ethernet1/108
+
+interface Ethernet1/109
+
+interface Ethernet1/110
+
+interface Ethernet1/111
+
+interface Ethernet1/112
+
+interface Ethernet1/113
+
+interface Ethernet1/114
+
+interface Ethernet1/115
+
+interface Ethernet1/116
+
+interface Ethernet1/117
+
+interface Ethernet1/118
+
+interface Ethernet1/119
+
+interface Ethernet1/120
+
+interface Ethernet1/121
+
+interface Ethernet1/122
+
+interface Ethernet1/123
+
+interface Ethernet1/124
+
+interface Ethernet1/125
+
+interface Ethernet1/126
+
+interface Ethernet1/127
+
+interface Ethernet1/128
 
 interface mgmt0
   description OOB Management
-  ! Configured on launch
-  no ip address
-  no shutdown
   vrf member management
-
-
+  ip address 172.16.30.107/24
 line console
 line vty
+no feature signature-verification
+
 
 
 </entry>
@@ -732,8 +1342,8 @@ line vty
             <entry key="AutoNetkit.ASN" type="Integer">1</entry>
             <entry key="static_ip" type="String">172.16.30.108</entry>
             <entry key="config">!Command: show running-config
-!Running configuration last done at: Sun Dec 15 17:20:53 2019
-!Time: Sun Dec 15 17:44:54 2019
+!Running configuration last done at: Mon Jan 20 18:53:36 2020
+!Time: Mon Jan 20 18:56:30 2020
 
 version 9.2(2) Bios:version  
 hostname dmz-sw01-2
@@ -773,6 +1383,7 @@ vpc domain 10
   peer-switch
   peer-keepalive destination 172.16.30.107 source 172.16.30.108
   peer-gateway
+  auto-recovery
 
 
 interface port-channel1
@@ -1099,47 +1710,361 @@ no feature signature-verification
             <entry key="AutoNetkit.ASN" type="Integer">1</entry>
             <entry key="static_ip" type="String">172.16.30.109</entry>
             <entry key="config">!Command: show running-config
-              !
-    hostname dmz-sw02-1
-    vdc nx id 1
-      limit-resource vlan minimum 16 maximum 4094
-      limit-resource vrf minimum 2 maximum 4096
-      limit-resource port-channel minimum 0 maximum 768
-      limit-resource u4route-mem minimum 96 maximum 96
-      limit-resource u6route-mem minimum 24 maximum 24
-      limit-resource m4route-mem minimum 58 maximum 58
-      limit-resource m6route-mem minimum 8 maximum 8
+!Running configuration last done at: Mon Jan 20 18:53:48 2020
+!Time: Mon Jan 20 18:56:29 2020
 
-    feature telnet
-    feature ssh
+version 9.2(2) Bios:version  
+hostname dmz-sw02-1
+vdc dmz-sw02-1 id 1
+  limit-resource vlan minimum 16 maximum 4094
+  limit-resource vrf minimum 2 maximum 4096
+  limit-resource port-channel minimum 0 maximum 511
+  limit-resource u4route-mem minimum 128 maximum 128
+  limit-resource u6route-mem minimum 96 maximum 96
+  limit-resource m4route-mem minimum 58 maximum 58
+  limit-resource m6route-mem minimum 8 maximum 8
 
-    no password strength-check
-    username admin password 5 $1$KuOSBsvW$Cy0TSD..gEBGBPjzpDgf51 role network-admin
-username cisco password 5 $1$Nk7ZkwH0$fyiRmMMfIheqE3BqvcL0C1 role network-operator
+feature telnet
+cfs eth distribute
+feature lacp
+feature vpc
+
+no password strength-check
+username admin password 5 $1$KuOSBsvW$Cy0TSD..gEBGBPjzpDgf51  role network-admin
+username cisco password 5 $1$Nk7ZkwH0$fyiRmMMfIheqE3BqvcL0C1  role network-operator
 username cisco role network-admin
-    no ip domain-lookup
+no ip domain-lookup
+rmon event 1 description FATAL(1) owner PMON@FATAL
+rmon event 2 description CRITICAL(2) owner PMON@CRITICAL
+rmon event 3 description ERROR(3) owner PMON@ERROR
+rmon event 4 description WARNING(4) owner PMON@WARNING
+rmon event 5 description INFORMATION(5) owner PMON@INFO
+
+vlan 1,11
+vlan 11
+  name outside-admin-fw
+
+vrf context management
+  ip route 0.0.0.0/0 172.16.30.254
+hardware forwarding unicast trace
+vpc domain 10
+  peer-switch
+  peer-keepalive destination 172.16.30.110 source 172.16.30.109
+  peer-gateway
 
 
-    vlan 1
+interface port-channel1
+  switchport mode trunk
+  spanning-tree port type network
+  vpc peer-link
 
-    vrf context management
-      ip route 0.0.0.0/0 172.16.30.254
+interface port-channel2
+  description Interswitch Fabric Link
+  switchport mode trunk
+  mtu 9216
+  vpc 2
 
-    hardware forwarding unicast trace
+interface port-channel11
+  description to dmz-rtr02-1
+  switchport mode trunk
+  switchport trunk allowed vlan 11
+  mtu 9216
+  vpc 11
 
-    interface mgmt0
-      description OOB Management
-      ! Configured on launch
-      no ip address
-      no shutdown
-      vrf member management
+interface port-channel12
+  description to dmz-rtr02-2
+  switchport mode trunk
+  switchport trunk allowed vlan 11
+  mtu 9216
+  vpc 12
+
+interface Ethernet1/1
+  description VPC Peer Link
+  switchport mode trunk
+  channel-group 1 mode active
+
+interface Ethernet1/2
+  description VPC Peer Link
+  switchport mode trunk
+  channel-group 1 mode active
+
+interface Ethernet1/3
+
+interface Ethernet1/4
+
+interface Ethernet1/5
+  description to dmz-rtr02-1
+  switchport mode trunk
+  switchport trunk allowed vlan 11
+  mtu 9216
+  channel-group 11 mode active
+
+interface Ethernet1/6
+  description to dmz-rtr02-2
+  switchport mode trunk
+  switchport trunk allowed vlan 11
+  mtu 9216
+  channel-group 12 mode active
+
+interface Ethernet1/7
+
+interface Ethernet1/8
+
+interface Ethernet1/9
+
+interface Ethernet1/10
+
+interface Ethernet1/11
+  description Interswitch Fabric Link
+  switchport mode trunk
+  mtu 9216
+  channel-group 2 mode active
+
+interface Ethernet1/12
+
+interface Ethernet1/13
+
+interface Ethernet1/14
+
+interface Ethernet1/15
+
+interface Ethernet1/16
+
+interface Ethernet1/17
+
+interface Ethernet1/18
+
+interface Ethernet1/19
+
+interface Ethernet1/20
+
+interface Ethernet1/21
+
+interface Ethernet1/22
+
+interface Ethernet1/23
+
+interface Ethernet1/24
+
+interface Ethernet1/25
+
+interface Ethernet1/26
+
+interface Ethernet1/27
+
+interface Ethernet1/28
+
+interface Ethernet1/29
+
+interface Ethernet1/30
+
+interface Ethernet1/31
+
+interface Ethernet1/32
+
+interface Ethernet1/33
+
+interface Ethernet1/34
+
+interface Ethernet1/35
+
+interface Ethernet1/36
+
+interface Ethernet1/37
+
+interface Ethernet1/38
+
+interface Ethernet1/39
+
+interface Ethernet1/40
+
+interface Ethernet1/41
+
+interface Ethernet1/42
+
+interface Ethernet1/43
+
+interface Ethernet1/44
+
+interface Ethernet1/45
+
+interface Ethernet1/46
+
+interface Ethernet1/47
+
+interface Ethernet1/48
+
+interface Ethernet1/49
+
+interface Ethernet1/50
+
+interface Ethernet1/51
+
+interface Ethernet1/52
+
+interface Ethernet1/53
+
+interface Ethernet1/54
+
+interface Ethernet1/55
+
+interface Ethernet1/56
+
+interface Ethernet1/57
+
+interface Ethernet1/58
+
+interface Ethernet1/59
+
+interface Ethernet1/60
+
+interface Ethernet1/61
+
+interface Ethernet1/62
+
+interface Ethernet1/63
+
+interface Ethernet1/64
+
+interface Ethernet1/65
+
+interface Ethernet1/66
+
+interface Ethernet1/67
+
+interface Ethernet1/68
+
+interface Ethernet1/69
+
+interface Ethernet1/70
+
+interface Ethernet1/71
+
+interface Ethernet1/72
+
+interface Ethernet1/73
+
+interface Ethernet1/74
+
+interface Ethernet1/75
+
+interface Ethernet1/76
+
+interface Ethernet1/77
+
+interface Ethernet1/78
+
+interface Ethernet1/79
+
+interface Ethernet1/80
+
+interface Ethernet1/81
+
+interface Ethernet1/82
+
+interface Ethernet1/83
+
+interface Ethernet1/84
+
+interface Ethernet1/85
+
+interface Ethernet1/86
+
+interface Ethernet1/87
+
+interface Ethernet1/88
+
+interface Ethernet1/89
+
+interface Ethernet1/90
+
+interface Ethernet1/91
+
+interface Ethernet1/92
+
+interface Ethernet1/93
+
+interface Ethernet1/94
+
+interface Ethernet1/95
+
+interface Ethernet1/96
+
+interface Ethernet1/97
+
+interface Ethernet1/98
+
+interface Ethernet1/99
+
+interface Ethernet1/100
+
+interface Ethernet1/101
+
+interface Ethernet1/102
+
+interface Ethernet1/103
+
+interface Ethernet1/104
+
+interface Ethernet1/105
+
+interface Ethernet1/106
+
+interface Ethernet1/107
+
+interface Ethernet1/108
+
+interface Ethernet1/109
+
+interface Ethernet1/110
+
+interface Ethernet1/111
+
+interface Ethernet1/112
+
+interface Ethernet1/113
+
+interface Ethernet1/114
+
+interface Ethernet1/115
+
+interface Ethernet1/116
+
+interface Ethernet1/117
+
+interface Ethernet1/118
+
+interface Ethernet1/119
+
+interface Ethernet1/120
+
+interface Ethernet1/121
+
+interface Ethernet1/122
+
+interface Ethernet1/123
+
+interface Ethernet1/124
+
+interface Ethernet1/125
+
+interface Ethernet1/126
+
+interface Ethernet1/127
+
+interface Ethernet1/128
+
+interface mgmt0
+  description OOB Management
+  vrf member management
+  ip address 172.16.30.109/24
+line console
+line vty
+no feature signature-verification
 
 
-    line console
-    line vty
 
-
-    </entry>
+</entry>
         </extensions>
         <interface id="0" name="Ethernet1/1"/>
         <interface id="1" name="Ethernet1/2"/>
@@ -1158,44 +2083,359 @@ username cisco role network-admin
         <extensions>
             <entry key="AutoNetkit.ASN" type="Integer">1</entry>
             <entry key="static_ip" type="String">172.16.30.110</entry>
-            <entry key="config">!
+            <entry key="config">!Command: show running-config
+!Running configuration last done at: Mon Jan 20 18:53:53 2020
+!Time: Mon Jan 20 18:56:28 2020
+
+version 9.2(2) Bios:version  
 hostname dmz-sw02-2
-vdc nx id 1
+vdc dmz-sw02-2 id 1
   limit-resource vlan minimum 16 maximum 4094
   limit-resource vrf minimum 2 maximum 4096
-  limit-resource port-channel minimum 0 maximum 768
-  limit-resource u4route-mem minimum 96 maximum 96
-  limit-resource u6route-mem minimum 24 maximum 24
+  limit-resource port-channel minimum 0 maximum 511
+  limit-resource u4route-mem minimum 128 maximum 128
+  limit-resource u6route-mem minimum 96 maximum 96
   limit-resource m4route-mem minimum 58 maximum 58
   limit-resource m6route-mem minimum 8 maximum 8
 
 feature telnet
-feature ssh
+cfs eth distribute
+feature lacp
+feature vpc
 
 no password strength-check
-username admin password 5 $1$KuOSBsvW$Cy0TSD..gEBGBPjzpDgf51 role network-admin
-username cisco password 5 $1$Nk7ZkwH0$fyiRmMMfIheqE3BqvcL0C1 role network-operator
+username admin password 5 $1$KuOSBsvW$Cy0TSD..gEBGBPjzpDgf51  role network-admin
+username cisco password 5 $1$Nk7ZkwH0$fyiRmMMfIheqE3BqvcL0C1  role network-operator
 username cisco role network-admin
 no ip domain-lookup
+rmon event 1 description FATAL(1) owner PMON@FATAL
+rmon event 2 description CRITICAL(2) owner PMON@CRITICAL
+rmon event 3 description ERROR(3) owner PMON@ERROR
+rmon event 4 description WARNING(4) owner PMON@WARNING
+rmon event 5 description INFORMATION(5) owner PMON@INFO
 
-
-vlan 1
+vlan 1,11
+vlan 11
+  name outside-admin-fw
 
 vrf context management
   ip route 0.0.0.0/0 172.16.30.254
-
 hardware forwarding unicast trace
+vpc domain 10
+  peer-switch
+  peer-keepalive destination 172.16.30.109 source 172.16.30.110
+  peer-gateway
+
+
+interface port-channel1
+  switchport mode trunk
+  spanning-tree port type network
+  vpc peer-link
+
+interface port-channel2
+  description Interswitch Fabric Link
+  switchport mode trunk
+  mtu 9216
+  vpc 2
+
+interface port-channel11
+  description to dmz-rtr02-1
+  switchport mode trunk
+  switchport trunk allowed vlan 11
+  mtu 9216
+  vpc 11
+
+interface port-channel12
+  description to dmz-rtr02-2
+  switchport mode trunk
+  switchport trunk allowed vlan 11
+  mtu 9216
+  vpc 12
+
+interface Ethernet1/1
+  description VPC Peer Link
+  switchport mode trunk
+  channel-group 1 mode active
+
+interface Ethernet1/2
+  description VPC Peer Link
+  switchport mode trunk
+  channel-group 1 mode active
+
+interface Ethernet1/3
+
+interface Ethernet1/4
+
+interface Ethernet1/5
+  description to dmz-rtr02-1
+  switchport mode trunk
+  switchport trunk allowed vlan 11
+  mtu 9216
+  channel-group 11 mode active
+
+interface Ethernet1/6
+  description to dmz-rtr02-2
+  switchport mode trunk
+  switchport trunk allowed vlan 11
+  mtu 9216
+  channel-group 12 mode active
+
+interface Ethernet1/7
+
+interface Ethernet1/8
+
+interface Ethernet1/9
+
+interface Ethernet1/10
+
+interface Ethernet1/11
+  description Interswitch Fabric Link
+  switchport mode trunk
+  mtu 9216
+  channel-group 2 mode active
+
+interface Ethernet1/12
+
+interface Ethernet1/13
+
+interface Ethernet1/14
+
+interface Ethernet1/15
+
+interface Ethernet1/16
+
+interface Ethernet1/17
+
+interface Ethernet1/18
+
+interface Ethernet1/19
+
+interface Ethernet1/20
+
+interface Ethernet1/21
+
+interface Ethernet1/22
+
+interface Ethernet1/23
+
+interface Ethernet1/24
+
+interface Ethernet1/25
+
+interface Ethernet1/26
+
+interface Ethernet1/27
+
+interface Ethernet1/28
+
+interface Ethernet1/29
+
+interface Ethernet1/30
+
+interface Ethernet1/31
+
+interface Ethernet1/32
+
+interface Ethernet1/33
+
+interface Ethernet1/34
+
+interface Ethernet1/35
+
+interface Ethernet1/36
+
+interface Ethernet1/37
+
+interface Ethernet1/38
+
+interface Ethernet1/39
+
+interface Ethernet1/40
+
+interface Ethernet1/41
+
+interface Ethernet1/42
+
+interface Ethernet1/43
+
+interface Ethernet1/44
+
+interface Ethernet1/45
+
+interface Ethernet1/46
+
+interface Ethernet1/47
+
+interface Ethernet1/48
+
+interface Ethernet1/49
+
+interface Ethernet1/50
+
+interface Ethernet1/51
+
+interface Ethernet1/52
+
+interface Ethernet1/53
+
+interface Ethernet1/54
+
+interface Ethernet1/55
+
+interface Ethernet1/56
+
+interface Ethernet1/57
+
+interface Ethernet1/58
+
+interface Ethernet1/59
+
+interface Ethernet1/60
+
+interface Ethernet1/61
+
+interface Ethernet1/62
+
+interface Ethernet1/63
+
+interface Ethernet1/64
+
+interface Ethernet1/65
+
+interface Ethernet1/66
+
+interface Ethernet1/67
+
+interface Ethernet1/68
+
+interface Ethernet1/69
+
+interface Ethernet1/70
+
+interface Ethernet1/71
+
+interface Ethernet1/72
+
+interface Ethernet1/73
+
+interface Ethernet1/74
+
+interface Ethernet1/75
+
+interface Ethernet1/76
+
+interface Ethernet1/77
+
+interface Ethernet1/78
+
+interface Ethernet1/79
+
+interface Ethernet1/80
+
+interface Ethernet1/81
+
+interface Ethernet1/82
+
+interface Ethernet1/83
+
+interface Ethernet1/84
+
+interface Ethernet1/85
+
+interface Ethernet1/86
+
+interface Ethernet1/87
+
+interface Ethernet1/88
+
+interface Ethernet1/89
+
+interface Ethernet1/90
+
+interface Ethernet1/91
+
+interface Ethernet1/92
+
+interface Ethernet1/93
+
+interface Ethernet1/94
+
+interface Ethernet1/95
+
+interface Ethernet1/96
+
+interface Ethernet1/97
+
+interface Ethernet1/98
+
+interface Ethernet1/99
+
+interface Ethernet1/100
+
+interface Ethernet1/101
+
+interface Ethernet1/102
+
+interface Ethernet1/103
+
+interface Ethernet1/104
+
+interface Ethernet1/105
+
+interface Ethernet1/106
+
+interface Ethernet1/107
+
+interface Ethernet1/108
+
+interface Ethernet1/109
+
+interface Ethernet1/110
+
+interface Ethernet1/111
+
+interface Ethernet1/112
+
+interface Ethernet1/113
+
+interface Ethernet1/114
+
+interface Ethernet1/115
+
+interface Ethernet1/116
+
+interface Ethernet1/117
+
+interface Ethernet1/118
+
+interface Ethernet1/119
+
+interface Ethernet1/120
+
+interface Ethernet1/121
+
+interface Ethernet1/122
+
+interface Ethernet1/123
+
+interface Ethernet1/124
+
+interface Ethernet1/125
+
+interface Ethernet1/126
+
+interface Ethernet1/127
+
+interface Ethernet1/128
 
 interface mgmt0
   description OOB Management
-  ! Configured on launch
-  no ip address
-  no shutdown
   vrf member management
-
-
+  ip address 172.16.30.110/24
 line console
 line vty
+no feature signature-verification
+
 
 
 </entry>
@@ -1218,7 +2458,7 @@ line vty
             <entry key="AutoNetkit.ASN" type="Integer">1</entry>
             <entry key="static_ip" type="String">172.16.30.171</entry>
             <entry key="config">!
-! Last configuration change at 19:32:37 UTC Wed Apr 17 2019
+! Last configuration change at 18:49:59 UTC Mon Jan 20 2020 by cisco
 !
 version 16.9
 service timestamps debug datetime msec
@@ -1233,6 +2473,15 @@ boot-start-marker
 boot-end-marker
 !
 !
+vrf definition Mgmt-intf
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+enable secret 5 $1$WXUN$fDoyiTGkJfEz6rZEQ.xYM/
 !
 no aaa new-model
 !
@@ -1254,10 +2503,10 @@ ip admission watch-list expiry-time 0
 !
 !
 subscriber templating
-!
-!
-!
-!
+! 
+! 
+! 
+! 
 !
 multilink bundle-name authenticated
 !
@@ -1265,6 +2514,15 @@ multilink bundle-name authenticated
 !
 !
 !
+crypto pki trustpoint TP-self-signed-126168147
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-126168147
+ revocation-check none
+ rsakeypair TP-self-signed-126168147
+!
+!
+crypto pki certificate chain TP-self-signed-126168147
+ certificate self-signed 01 nvram:IOS-Self-Sig#1.cer
 !
 !
 !
@@ -1273,8 +2531,7 @@ multilink bundle-name authenticated
 !
 !
 !
-!
-license udi pid CSR1000V sn 9CYSPC90V1R
+license udi pid CSR1000V sn 9VCULCXY64S
 no license smart enable
 diagnostic bootup level minimal
 !
@@ -1282,6 +2539,7 @@ spanning-tree extend system-id
 !
 !
 !
+username cisco privilege 15 secret 5 $1$xiTg$HM5D34bztIFwSVlwIXcXz1
 !
 redundancy
 !
@@ -1290,6 +2548,7 @@ redundancy
 !
 !
 !
+! 
 !
 !
 !
@@ -1302,47 +2561,55 @@ redundancy
 !
 !
 !
-!
-!
-!
-!
-!
-vrf definition Mgmt-intf
-!
- address-family ipv4
- exit-address-family
- !
- address-family ipv6
- exit-address-family
+! 
+! 
 !
 !
 interface GigabitEthernet1
-  description OOB Management
-  vrf forwarding Mgmt-intf
-  ! Configured on launch
-  no ip address
-  cdp enable
-  duplex full
-  speed auto
-  no shutdown
-!
-ip route vrf Mgmt-intf 0.0.0.0 0.0.0.0 172.16.30.254
+ description OOB Management
+ vrf forwarding Mgmt-intf
+ ip address 172.16.30.171 255.255.255.0
+ negotiation auto
+ cdp enable
+ no mop enabled
+ no mop sysid
 !
 interface GigabitEthernet2
+ ip address 10.225.71.3 255.255.255.248
  negotiation auto
  no mop enabled
  no mop sysid
 !
 interface GigabitEthernet3
+ ip address 10.225.72.1 255.255.255.0
+ ip nat inside
+ negotiation auto
+ no mop enabled
+ no mop sysid
+!
+interface GigabitEthernet4
+ no ip address
+ shutdown
+ negotiation auto
+ no mop enabled
+ no mop sysid
+!
+interface GigabitEthernet5
+ no ip address
+ shutdown
  negotiation auto
  no mop enabled
  no mop sysid
 !
 ip forward-protocol nd
 no ip http server
+ip http authentication local
 ip http secure-server
 ip http client source-interface GigabitEthernet1
 ip tftp source-interface GigabitEthernet1
+ip route 10.225.0.0 255.255.0.0 10.225.71.27
+ip route 10.225.64.0 255.255.255.0 10.225.71.2
+ip route vrf Mgmt-intf 0.0.0.0 0.0.0.0 172.16.30.254
 !
 !
 !
@@ -1388,45 +2655,568 @@ end
         <extensions>
             <entry key="AutoNetkit.ASN" type="Integer">1</entry>
             <entry key="static_ip" type="String">172.16.30.103</entry>
-            <entry key="config">!
-!
+            <entry key="config">!Command: show running-config
+!Running configuration last done at: Mon Jan 20 18:54:57 2020
+!Time: Mon Jan 20 18:56:28 2020
+
+version 9.2(2) Bios:version  
 hostname leaf01-1
-vdc nx id 1
+vdc leaf01-1 id 1
   limit-resource vlan minimum 16 maximum 4094
   limit-resource vrf minimum 2 maximum 4096
-  limit-resource port-channel minimum 0 maximum 768
-  limit-resource u4route-mem minimum 96 maximum 96
-  limit-resource u6route-mem minimum 24 maximum 24
+  limit-resource port-channel minimum 0 maximum 511
+  limit-resource u4route-mem minimum 128 maximum 128
+  limit-resource u6route-mem minimum 96 maximum 96
   limit-resource m4route-mem minimum 58 maximum 58
   limit-resource m6route-mem minimum 8 maximum 8
 
 feature telnet
-feature ssh
+cfs eth distribute
+feature ospf
+feature interface-vlan
+feature hsrp
+feature lacp
+feature vpc
 
 no password strength-check
-username admin password 5 $1$KuOSBsvW$Cy0TSD..gEBGBPjzpDgf51 role network-admin
-username cisco password 5 $1$Nk7ZkwH0$fyiRmMMfIheqE3BqvcL0C1 role network-operator
+username admin password 5 $1$KuOSBsvW$Cy0TSD..gEBGBPjzpDgf51  role network-admin
+username cisco password 5 $1$Nk7ZkwH0$fyiRmMMfIheqE3BqvcL0C1  role network-operator
 username cisco role network-admin
 no ip domain-lookup
+rmon event 1 description FATAL(1) owner PMON@FATAL
+rmon event 2 description CRITICAL(2) owner PMON@CRITICAL
+rmon event 3 description ERROR(3) owner PMON@ERROR
+rmon event 4 description WARNING(4) owner PMON@WARNING
+rmon event 5 description INFORMATION(5) owner PMON@INFO
 
+vlan 1,10-12,100-103,201-203,900-901,3001
+vlan 10
+  name trusted-transit
+vlan 11
+  name admin-systems
+vlan 12
+  name mgmt
+vlan 100
+  name dmz-transit
+vlan 101
+  name prod-web
+vlan 102
+  name prod-app
+vlan 103
+  name prod-data
+vlan 201
+  name dev-web
+vlan 202
+  name dev-app
+vlan 203
+  name dev-data
+vlan 900
+  name guest-transit
+vlan 901
+  name hotspot
+vlan 3001
+  name backdoor-temp
 
-vlan 1
-
+vrf context backdoor
+vrf context dmz
+  ip route 0.0.0.0/0 10.225.250.4
+vrf context guest
 vrf context management
   ip route 0.0.0.0/0 172.16.30.254
-
+vrf context trusted
+  ip route 0.0.0.0/0 10.225.250.4
 hardware forwarding unicast trace
+vpc domain 10
+  peer-switch
+  peer-keepalive destination 172.16.30.104 source 172.16.30.103
+  peer-gateway
+
+
+interface Vlan1
+  no ip redirects
+  no ipv6 redirects
+
+interface Vlan10
+  no shutdown
+  vrf member trusted
+  no ip redirects
+  ip address 10.225.250.2/29
+  no ipv6 redirects
+  no ip ospf passive-interface
+  ip router ospf 1 area 0.0.0.0
+  hsrp version 2
+  hsrp 1 
+    preempt 
+    priority 110
+    ip 10.225.250.1
+
+interface Vlan11
+  no shutdown
+  vrf member trusted
+  no ip redirects
+  ip address 10.225.1.2/24
+  no ipv6 redirects
+  ip router ospf 1 area 0.0.0.0
+  hsrp version 2
+  hsrp 1 
+    preempt 
+    priority 110
+    ip 10.225.1.1
+
+interface Vlan12
+  no shutdown
+  vrf member trusted
+  no ip redirects
+  ip address 10.225.2.2/24
+  no ipv6 redirects
+  ip router ospf 1 area 0.0.0.0
+  hsrp version 2
+  hsrp 1 
+    preempt 
+    priority 110
+    ip 10.225.2.1
+
+interface Vlan100
+  no shutdown
+  vrf member dmz
+  no ip redirects
+  ip address 10.225.250.34/29
+  no ipv6 redirects
+  no ip ospf passive-interface
+  ip router ospf 1 area 0.0.0.0
+  hsrp version 2
+  hsrp 1 
+    preempt 
+    priority 110
+    ip 10.225.250.33
+
+interface Vlan101
+  no shutdown
+  vrf member dmz
+  no ip redirects
+  ip address 10.225.9.2/24
+  no ipv6 redirects
+  ip router ospf 1 area 0.0.0.0
+  hsrp version 2
+  hsrp 1 
+    preempt 
+    priority 110
+    ip 10.225.9.1
+
+interface Vlan102
+  no shutdown
+  vrf member trusted
+  no ip redirects
+  ip address 10.225.10.2/24
+  no ipv6 redirects
+  ip router ospf 1 area 0.0.0.0
+  hsrp version 2
+  hsrp 1 
+    preempt 
+    priority 110
+    ip 10.225.10.1
+
+interface Vlan103
+  no shutdown
+  vrf member trusted
+  no ip redirects
+  ip address 10.225.11.2/24
+  no ipv6 redirects
+  ip router ospf 1 area 0.0.0.0
+  hsrp version 2
+  hsrp 1 
+    preempt 
+    priority 110
+    ip 10.225.11.1
+
+interface Vlan201
+  no shutdown
+  vrf member dmz
+  no ip redirects
+  ip address 10.225.17.2/24
+  no ipv6 redirects
+  ip router ospf 1 area 0.0.0.0
+  hsrp version 2
+  hsrp 1 
+    preempt 
+    priority 110
+    ip 10.225.17.1
+
+interface Vlan202
+  no shutdown
+  vrf member trusted
+  no ip redirects
+  ip address 10.225.18.2/24
+  no ipv6 redirects
+  ip router ospf 1 area 0.0.0.0
+  hsrp version 2
+  hsrp 1 
+    preempt 
+    priority 110
+    ip 10.225.18.1
+
+interface Vlan203
+  no shutdown
+  vrf member trusted
+  no ip redirects
+  ip address 10.225.19.2/24
+  no ipv6 redirects
+  ip router ospf 1 area 0.0.0.0
+  hsrp version 2
+  hsrp 1 
+    preempt 
+    priority 110
+    ip 10.225.19.1
+
+interface Vlan900
+  no shutdown
+  vrf member guest
+  no ip redirects
+  ip address 10.225.250.50/29
+  no ipv6 redirects
+  no ip ospf passive-interface
+  ip router ospf 1 area 0.0.0.0
+  hsrp version 2
+  hsrp 1 
+    preempt 
+    priority 110
+    ip 10.225.250.49
+
+interface Vlan901
+  no shutdown
+  vrf member guest
+  no ip redirects
+  ip address 10.225.49.2/24
+  no ipv6 redirects
+  ip router ospf 1 area 0.0.0.0
+  hsrp version 2
+  hsrp 1 
+    preempt 
+    priority 110
+    ip 10.225.49.1
+
+interface Vlan3001
+  no shutdown
+  vrf member backdoor
+  no ip redirects
+  ip address 172.16.30.2/24
+  no ipv6 redirects
+  ip router ospf 1 area 0.0.0.0
+  hsrp version 2
+  hsrp 1 
+    preempt 
+    priority 110
+    ip 172.16.30.1
+
+interface port-channel1
+  switchport mode trunk
+  spanning-tree port type network
+  vpc peer-link
+
+interface port-channel2
+  description Interswitch Fabric Link
+  switchport mode trunk
+  mtu 9216
+  vpc 2
+
+interface port-channel3
+  description Interswitch Fabric Link
+  switchport mode trunk
+  mtu 9216
+  vpc 3
+
+interface Ethernet1/1
+  description VPC Peer Link
+  switchport mode trunk
+  channel-group 1 mode active
+
+interface Ethernet1/2
+  description VPC Peer Link
+  switchport mode trunk
+  channel-group 1 mode active
+
+interface Ethernet1/3
+  description Interswitch Fabric Link
+  switchport mode trunk
+  mtu 9216
+  channel-group 2 mode active
+
+interface Ethernet1/4
+  description Interswitch Fabric Link
+  switchport mode trunk
+  mtu 9216
+  channel-group 2 mode active
+
+interface Ethernet1/5
+
+interface Ethernet1/6
+
+interface Ethernet1/7
+
+interface Ethernet1/8
+
+interface Ethernet1/9
+
+interface Ethernet1/10
+
+interface Ethernet1/11
+  description Interswitch Fabric Link
+  switchport mode trunk
+  mtu 9216
+  channel-group 3 mode active
+
+interface Ethernet1/12
+
+interface Ethernet1/13
+
+interface Ethernet1/14
+
+interface Ethernet1/15
+
+interface Ethernet1/16
+
+interface Ethernet1/17
+
+interface Ethernet1/18
+
+interface Ethernet1/19
+
+interface Ethernet1/20
+
+interface Ethernet1/21
+
+interface Ethernet1/22
+
+interface Ethernet1/23
+
+interface Ethernet1/24
+
+interface Ethernet1/25
+
+interface Ethernet1/26
+
+interface Ethernet1/27
+
+interface Ethernet1/28
+
+interface Ethernet1/29
+
+interface Ethernet1/30
+
+interface Ethernet1/31
+
+interface Ethernet1/32
+
+interface Ethernet1/33
+
+interface Ethernet1/34
+
+interface Ethernet1/35
+
+interface Ethernet1/36
+
+interface Ethernet1/37
+
+interface Ethernet1/38
+
+interface Ethernet1/39
+
+interface Ethernet1/40
+
+interface Ethernet1/41
+
+interface Ethernet1/42
+
+interface Ethernet1/43
+
+interface Ethernet1/44
+
+interface Ethernet1/45
+
+interface Ethernet1/46
+
+interface Ethernet1/47
+
+interface Ethernet1/48
+
+interface Ethernet1/49
+
+interface Ethernet1/50
+
+interface Ethernet1/51
+
+interface Ethernet1/52
+
+interface Ethernet1/53
+
+interface Ethernet1/54
+
+interface Ethernet1/55
+
+interface Ethernet1/56
+
+interface Ethernet1/57
+
+interface Ethernet1/58
+
+interface Ethernet1/59
+
+interface Ethernet1/60
+
+interface Ethernet1/61
+
+interface Ethernet1/62
+
+interface Ethernet1/63
+
+interface Ethernet1/64
+
+interface Ethernet1/65
+
+interface Ethernet1/66
+
+interface Ethernet1/67
+
+interface Ethernet1/68
+
+interface Ethernet1/69
+
+interface Ethernet1/70
+
+interface Ethernet1/71
+
+interface Ethernet1/72
+
+interface Ethernet1/73
+
+interface Ethernet1/74
+
+interface Ethernet1/75
+
+interface Ethernet1/76
+
+interface Ethernet1/77
+
+interface Ethernet1/78
+
+interface Ethernet1/79
+
+interface Ethernet1/80
+
+interface Ethernet1/81
+
+interface Ethernet1/82
+
+interface Ethernet1/83
+
+interface Ethernet1/84
+
+interface Ethernet1/85
+
+interface Ethernet1/86
+
+interface Ethernet1/87
+
+interface Ethernet1/88
+
+interface Ethernet1/89
+
+interface Ethernet1/90
+
+interface Ethernet1/91
+
+interface Ethernet1/92
+
+interface Ethernet1/93
+
+interface Ethernet1/94
+
+interface Ethernet1/95
+
+interface Ethernet1/96
+
+interface Ethernet1/97
+
+interface Ethernet1/98
+
+interface Ethernet1/99
+
+interface Ethernet1/100
+
+interface Ethernet1/101
+
+interface Ethernet1/102
+
+interface Ethernet1/103
+
+interface Ethernet1/104
+
+interface Ethernet1/105
+
+interface Ethernet1/106
+
+interface Ethernet1/107
+
+interface Ethernet1/108
+
+interface Ethernet1/109
+
+interface Ethernet1/110
+
+interface Ethernet1/111
+
+interface Ethernet1/112
+
+interface Ethernet1/113
+
+interface Ethernet1/114
+
+interface Ethernet1/115
+
+interface Ethernet1/116
+
+interface Ethernet1/117
+
+interface Ethernet1/118
+
+interface Ethernet1/119
+
+interface Ethernet1/120
+
+interface Ethernet1/121
+
+interface Ethernet1/122
+
+interface Ethernet1/123
+
+interface Ethernet1/124
+
+interface Ethernet1/125
+
+interface Ethernet1/126
+
+interface Ethernet1/127
+
+interface Ethernet1/128
 
 interface mgmt0
   description OOB Management
-  ! Configured on launch
-  no ip address
-  no shutdown
   vrf member management
-
-
+  ip address 172.16.30.103/24
 line console
 line vty
+no feature signature-verification
+router ospf 1
+  vrf backdoor
+    passive-interface default
+  vrf dmz
+    passive-interface default
+  vrf guest
+    passive-interface default
+  vrf trusted
+    passive-interface default
+
+
 
 </entry>
         </extensions>
@@ -1449,45 +3239,569 @@ line vty
         <extensions>
             <entry key="AutoNetkit.ASN" type="Integer">1</entry>
             <entry key="static_ip" type="String">172.16.30.104</entry>
-            <entry key="config">!
-!
+            <entry key="config">!Command: show running-config
+!Running configuration last done at: Mon Jan 20 18:54:55 2020
+!Time: Mon Jan 20 18:56:28 2020
+
+version 9.2(2) Bios:version  
 hostname leaf01-2
-vdc nx id 1
+vdc leaf01-2 id 1
   limit-resource vlan minimum 16 maximum 4094
   limit-resource vrf minimum 2 maximum 4096
-  limit-resource port-channel minimum 0 maximum 768
-  limit-resource u4route-mem minimum 96 maximum 96
-  limit-resource u6route-mem minimum 24 maximum 24
+  limit-resource port-channel minimum 0 maximum 511
+  limit-resource u4route-mem minimum 128 maximum 128
+  limit-resource u6route-mem minimum 96 maximum 96
   limit-resource m4route-mem minimum 58 maximum 58
   limit-resource m6route-mem minimum 8 maximum 8
 
 feature telnet
-feature ssh
+cfs eth distribute
+feature ospf
+feature interface-vlan
+feature hsrp
+feature lacp
+feature vpc
 
 no password strength-check
-username admin password 5 $1$KuOSBsvW$Cy0TSD..gEBGBPjzpDgf51 role network-admin
-username cisco password 5 $1$Nk7ZkwH0$fyiRmMMfIheqE3BqvcL0C1 role network-operator
+username admin password 5 $1$KuOSBsvW$Cy0TSD..gEBGBPjzpDgf51  role network-admin
+username cisco password 5 $1$Nk7ZkwH0$fyiRmMMfIheqE3BqvcL0C1  role network-operator
 username cisco role network-admin
 no ip domain-lookup
+rmon event 1 description FATAL(1) owner PMON@FATAL
+rmon event 2 description CRITICAL(2) owner PMON@CRITICAL
+rmon event 3 description ERROR(3) owner PMON@ERROR
+rmon event 4 description WARNING(4) owner PMON@WARNING
+rmon event 5 description INFORMATION(5) owner PMON@INFO
 
+vlan 1,10-12,100-103,201-203,900-901,3001
+vlan 10
+  name trusted-transit
+vlan 11
+  name admin-systems
+vlan 12
+  name mgmt
+vlan 100
+  name dmz-transit
+vlan 101
+  name prod-web
+vlan 102
+  name prod-app
+vlan 103
+  name prod-data
+vlan 201
+  name dev-web
+vlan 202
+  name dev-app
+vlan 203
+  name dev-data
+vlan 900
+  name guest-transit
+vlan 901
+  name hotspot
+vlan 3001
+  name backdoor-temp
 
-vlan 1
-
+vrf context backdoor
+vrf context dmz
+  ip route 0.0.0.0/0 10.225.250.4
+vrf context guest
 vrf context management
   ip route 0.0.0.0/0 172.16.30.254
-
+vrf context trusted
+  ip route 0.0.0.0/0 10.225.250.4
 hardware forwarding unicast trace
+vpc domain 10
+  peer-switch
+  peer-keepalive destination 172.16.30.103 source 172.16.30.104
+  peer-gateway
+
+
+interface Vlan1
+  no ip redirects
+  no ipv6 redirects
+
+interface Vlan10
+  no shutdown
+  vrf member trusted
+  no ip redirects
+  ip address 10.225.250.3/29
+  no ipv6 redirects
+  no ip ospf passive-interface
+  ip router ospf 1 area 0.0.0.0
+  hsrp version 2
+  hsrp 1 
+    preempt 
+    priority 90
+    ip 10.225.250.1
+
+interface Vlan11
+  no shutdown
+  vrf member trusted
+  no ip redirects
+  ip address 10.225.1.3/24
+  no ipv6 redirects
+  ip router ospf 1 area 0.0.0.0
+  hsrp version 2
+  hsrp 1 
+    preempt 
+    priority 90
+    ip 10.225.1.1
+
+interface Vlan12
+  no shutdown
+  vrf member trusted
+  no ip redirects
+  ip address 10.225.2.3/24
+  no ipv6 redirects
+  ip router ospf 1 area 0.0.0.0
+  hsrp version 2
+  hsrp 1 
+    preempt 
+    priority 90
+    ip 10.225.2.1
+
+interface Vlan100
+  no shutdown
+  vrf member dmz
+  no ip redirects
+  ip address 10.225.250.35/29
+  no ipv6 redirects
+  no ip ospf passive-interface
+  ip router ospf 1 area 0.0.0.0
+  hsrp version 2
+  hsrp 1 
+    preempt 
+    priority 90
+    ip 10.225.250.33
+
+interface Vlan101
+  no shutdown
+  vrf member dmz
+  no ip redirects
+  ip address 10.225.9.3/24
+  no ipv6 redirects
+  ip router ospf 1 area 0.0.0.0
+  hsrp version 2
+  hsrp 1 
+    preempt 
+    priority 90
+    ip 10.225.9.1
+
+interface Vlan102
+  no shutdown
+  vrf member trusted
+  no ip redirects
+  ip address 10.225.10.3/24
+  no ipv6 redirects
+  ip router ospf 1 area 0.0.0.0
+  hsrp version 2
+  hsrp 1 
+    preempt 
+    priority 90
+    ip 10.225.10.1
+
+interface Vlan103
+  no shutdown
+  vrf member trusted
+  no ip redirects
+  ip address 10.225.11.3/24
+  no ipv6 redirects
+  ip router ospf 1 area 0.0.0.0
+  hsrp version 2
+  hsrp 1 
+    preempt 
+    priority 90
+    ip 10.225.11.1
+
+interface Vlan201
+  no shutdown
+  vrf member dmz
+  no ip redirects
+  ip address 10.225.17.3/24
+  no ipv6 redirects
+  ip router ospf 1 area 0.0.0.0
+  hsrp version 2
+  hsrp 1 
+    preempt 
+    priority 90
+    ip 10.225.17.1
+
+interface Vlan202
+  no shutdown
+  vrf member trusted
+  no ip redirects
+  ip address 10.225.18.3/24
+  no ipv6 redirects
+  ip router ospf 1 area 0.0.0.0
+  hsrp version 2
+  hsrp 1 
+    preempt 
+    priority 90
+    ip 10.225.18.1
+
+interface Vlan203
+  no shutdown
+  vrf member trusted
+  no ip redirects
+  ip address 10.225.19.3/24
+  no ipv6 redirects
+  ip router ospf 1 area 0.0.0.0
+  hsrp version 2
+  hsrp 1 
+    preempt 
+    priority 90
+    ip 10.225.19.1
+
+interface Vlan900
+  no shutdown
+  vrf member guest
+  no ip redirects
+  ip address 10.225.250.51/29
+  no ipv6 redirects
+  no ip ospf passive-interface
+  ip router ospf 1 area 0.0.0.0
+  hsrp version 2
+  hsrp 1 
+    preempt 
+    priority 90
+    ip 10.225.250.49
+
+interface Vlan901
+  no shutdown
+  vrf member guest
+  no ip redirects
+  ip address 10.225.49.3/24
+  no ipv6 redirects
+  ip router ospf 1 area 0.0.0.0
+  hsrp version 2
+  hsrp 1 
+    preempt 
+    priority 90
+    ip 10.225.49.1
+
+interface Vlan3001
+  no shutdown
+  vrf member backdoor
+  no ip redirects
+  ip address 172.16.30.3/24
+  no ipv6 redirects
+  ip router ospf 1 area 0.0.0.0
+  hsrp version 2
+  hsrp 1 
+    preempt 
+    priority 90
+    ip 172.16.30.1
+
+interface port-channel1
+  switchport mode trunk
+  spanning-tree port type network
+  vpc peer-link
+
+interface port-channel2
+  description Interswitch Fabric Link
+  switchport mode trunk
+  mtu 9216
+  vpc 2
+
+interface port-channel3
+  description Interswitch Fabric Link
+  switchport mode trunk
+  mtu 9216
+  vpc 3
+
+interface Ethernet1/1
+  description VPC Peer Link
+  switchport mode trunk
+  channel-group 1 mode active
+
+interface Ethernet1/2
+  description VPC Peer Link
+  switchport mode trunk
+  channel-group 1 mode active
+
+interface Ethernet1/3
+  description Interswitch Fabric Link
+  switchport mode trunk
+  mtu 9216
+  channel-group 2 mode active
+
+interface Ethernet1/4
+  description Interswitch Fabric Link
+  switchport mode trunk
+  mtu 9216
+  channel-group 2 mode active
+
+interface Ethernet1/5
+
+interface Ethernet1/6
+
+interface Ethernet1/7
+
+interface Ethernet1/8
+
+interface Ethernet1/9
+
+interface Ethernet1/10
+
+interface Ethernet1/11
+  description Interswitch Fabric Link
+  switchport mode trunk
+  mtu 9216
+  channel-group 3 mode active
+
+interface Ethernet1/12
+
+interface Ethernet1/13
+
+interface Ethernet1/14
+
+interface Ethernet1/15
+
+interface Ethernet1/16
+
+interface Ethernet1/17
+
+interface Ethernet1/18
+
+interface Ethernet1/19
+
+interface Ethernet1/20
+
+interface Ethernet1/21
+
+interface Ethernet1/22
+
+interface Ethernet1/23
+
+interface Ethernet1/24
+
+interface Ethernet1/25
+
+interface Ethernet1/26
+
+interface Ethernet1/27
+
+interface Ethernet1/28
+
+interface Ethernet1/29
+
+interface Ethernet1/30
+
+interface Ethernet1/31
+
+interface Ethernet1/32
+
+interface Ethernet1/33
+
+interface Ethernet1/34
+
+interface Ethernet1/35
+
+interface Ethernet1/36
+
+interface Ethernet1/37
+
+interface Ethernet1/38
+
+interface Ethernet1/39
+
+interface Ethernet1/40
+
+interface Ethernet1/41
+
+interface Ethernet1/42
+
+interface Ethernet1/43
+
+interface Ethernet1/44
+
+interface Ethernet1/45
+
+interface Ethernet1/46
+
+interface Ethernet1/47
+
+interface Ethernet1/48
+
+interface Ethernet1/49
+
+interface Ethernet1/50
+
+interface Ethernet1/51
+
+interface Ethernet1/52
+
+interface Ethernet1/53
+
+interface Ethernet1/54
+
+interface Ethernet1/55
+
+interface Ethernet1/56
+
+interface Ethernet1/57
+
+interface Ethernet1/58
+
+interface Ethernet1/59
+
+interface Ethernet1/60
+
+interface Ethernet1/61
+
+interface Ethernet1/62
+
+interface Ethernet1/63
+
+interface Ethernet1/64
+
+interface Ethernet1/65
+
+interface Ethernet1/66
+
+interface Ethernet1/67
+
+interface Ethernet1/68
+
+interface Ethernet1/69
+
+interface Ethernet1/70
+
+interface Ethernet1/71
+
+interface Ethernet1/72
+
+interface Ethernet1/73
+
+interface Ethernet1/74
+
+interface Ethernet1/75
+
+interface Ethernet1/76
+
+interface Ethernet1/77
+
+interface Ethernet1/78
+
+interface Ethernet1/79
+
+interface Ethernet1/80
+
+interface Ethernet1/81
+
+interface Ethernet1/82
+
+interface Ethernet1/83
+
+interface Ethernet1/84
+
+interface Ethernet1/85
+
+interface Ethernet1/86
+
+interface Ethernet1/87
+
+interface Ethernet1/88
+
+interface Ethernet1/89
+
+interface Ethernet1/90
+
+interface Ethernet1/91
+
+interface Ethernet1/92
+
+interface Ethernet1/93
+
+interface Ethernet1/94
+
+interface Ethernet1/95
+
+interface Ethernet1/96
+
+interface Ethernet1/97
+
+interface Ethernet1/98
+
+interface Ethernet1/99
+
+interface Ethernet1/100
+
+interface Ethernet1/101
+
+interface Ethernet1/102
+
+interface Ethernet1/103
+
+interface Ethernet1/104
+
+interface Ethernet1/105
+
+interface Ethernet1/106
+
+interface Ethernet1/107
+
+interface Ethernet1/108
+
+interface Ethernet1/109
+
+interface Ethernet1/110
+
+interface Ethernet1/111
+
+interface Ethernet1/112
+
+interface Ethernet1/113
+
+interface Ethernet1/114
+
+interface Ethernet1/115
+
+interface Ethernet1/116
+
+interface Ethernet1/117
+
+interface Ethernet1/118
+
+interface Ethernet1/119
+
+interface Ethernet1/120
+
+interface Ethernet1/121
+
+interface Ethernet1/122
+
+interface Ethernet1/123
+
+interface Ethernet1/124
+
+interface Ethernet1/125
+
+interface Ethernet1/126
+
+interface Ethernet1/127
+
+interface Ethernet1/128
 
 interface mgmt0
   description OOB Management
-  ! Configured on launch
-  no ip address
-  no shutdown
   vrf member management
-
-
+  ip address 172.16.30.104/24
 line console
 line vty
+no feature signature-verification
+router ospf 1
+  vrf backdoor
+    passive-interface default
+  vrf dmz
+    passive-interface default
+  vrf guest
+    passive-interface default
+  vrf trusted
+    passive-interface default
+
+
+
 </entry>
         </extensions>
         <interface id="0" name="Ethernet1/1"/>
@@ -1509,45 +3823,384 @@ line vty
         <extensions>
             <entry key="AutoNetkit.ASN" type="Integer">1</entry>
             <entry key="static_ip" type="String">172.16.30.105</entry>
-            <entry key="config">!
-!
+            <entry key="config">!Command: show running-config
+!Running configuration last done at: Mon Jan 20 18:54:06 2020
+!Time: Mon Jan 20 18:56:30 2020
+
+version 9.2(2) Bios:version  
 hostname leaf02-1
-vdc nx id 1
+vdc leaf02-1 id 1
   limit-resource vlan minimum 16 maximum 4094
   limit-resource vrf minimum 2 maximum 4096
-  limit-resource port-channel minimum 0 maximum 768
-  limit-resource u4route-mem minimum 96 maximum 96
-  limit-resource u6route-mem minimum 24 maximum 24
+  limit-resource port-channel minimum 0 maximum 511
+  limit-resource u4route-mem minimum 128 maximum 128
+  limit-resource u6route-mem minimum 96 maximum 96
   limit-resource m4route-mem minimum 58 maximum 58
   limit-resource m6route-mem minimum 8 maximum 8
 
 feature telnet
-feature ssh
+cfs eth distribute
+feature lacp
+feature vpc
 
 no password strength-check
-username admin password 5 $1$KuOSBsvW$Cy0TSD..gEBGBPjzpDgf51 role network-admin
-username cisco password 5 $1$Nk7ZkwH0$fyiRmMMfIheqE3BqvcL0C1 role network-operator
+username admin password 5 $1$KuOSBsvW$Cy0TSD..gEBGBPjzpDgf51  role network-admin
+username cisco password 5 $1$Nk7ZkwH0$fyiRmMMfIheqE3BqvcL0C1  role network-operator
 username cisco role network-admin
 no ip domain-lookup
+rmon event 1 description FATAL(1) owner PMON@FATAL
+rmon event 2 description CRITICAL(2) owner PMON@CRITICAL
+rmon event 3 description ERROR(3) owner PMON@ERROR
+rmon event 4 description WARNING(4) owner PMON@WARNING
+rmon event 5 description INFORMATION(5) owner PMON@INFO
 
-
-vlan 1
+vlan 1,10-12,100-103,201-203,900-901,3001
+vlan 10
+  name trusted-transit
+vlan 11
+  name admin-systems
+vlan 12
+  name mgmt
+vlan 100
+  name dmz-transit
+vlan 101
+  name prod-web
+vlan 102
+  name prod-app
+vlan 103
+  name prod-data
+vlan 201
+  name dev-web
+vlan 202
+  name dev-app
+vlan 203
+  name dev-data
+vlan 900
+  name guest-transit
+vlan 901
+  name hotspot
+vlan 3001
+  name backdoor-temp
 
 vrf context management
   ip route 0.0.0.0/0 172.16.30.254
-
 hardware forwarding unicast trace
+vpc domain 11
+  peer-switch
+  peer-keepalive destination 172.16.30.106 source 172.16.30.105
+  peer-gateway
+
+
+interface port-channel1
+  switchport mode trunk
+  spanning-tree port type network
+  vpc peer-link
+
+interface port-channel2
+  description Interswitch Fabric Link
+  switchport mode trunk
+  mtu 9216
+  vpc 2
+
+interface port-channel3
+  description Interswitch Fabric Link
+  switchport mode trunk
+  mtu 9216
+  vpc 3
+
+interface port-channel4
+  description Interswitch Fabric Link
+  switchport mode trunk
+  mtu 9216
+  vpc 4
+
+interface Ethernet1/1
+  description VPC Peer Link
+  switchport mode trunk
+  channel-group 1 mode active
+
+interface Ethernet1/2
+  description VPC Peer Link
+  switchport mode trunk
+  channel-group 1 mode active
+
+interface Ethernet1/3
+  description Interswitch Fabric Link
+  switchport mode trunk
+  mtu 9216
+  channel-group 2 mode active
+
+interface Ethernet1/4
+  description Interswitch Fabric Link
+  switchport mode trunk
+  mtu 9216
+  channel-group 2 mode active
+
+interface Ethernet1/5
+  description Interswitch Fabric Link
+  switchport mode trunk
+  mtu 9216
+  channel-group 4 mode active
+
+interface Ethernet1/6
+  description Interswitch Fabric Link
+  switchport mode trunk
+  mtu 9216
+  channel-group 3 mode active
+
+interface Ethernet1/7
+
+interface Ethernet1/8
+
+interface Ethernet1/9
+
+interface Ethernet1/10
+
+interface Ethernet1/11
+
+interface Ethernet1/12
+
+interface Ethernet1/13
+
+interface Ethernet1/14
+
+interface Ethernet1/15
+
+interface Ethernet1/16
+
+interface Ethernet1/17
+
+interface Ethernet1/18
+
+interface Ethernet1/19
+
+interface Ethernet1/20
+
+interface Ethernet1/21
+
+interface Ethernet1/22
+
+interface Ethernet1/23
+
+interface Ethernet1/24
+
+interface Ethernet1/25
+
+interface Ethernet1/26
+
+interface Ethernet1/27
+
+interface Ethernet1/28
+
+interface Ethernet1/29
+
+interface Ethernet1/30
+
+interface Ethernet1/31
+
+interface Ethernet1/32
+
+interface Ethernet1/33
+
+interface Ethernet1/34
+
+interface Ethernet1/35
+
+interface Ethernet1/36
+
+interface Ethernet1/37
+
+interface Ethernet1/38
+
+interface Ethernet1/39
+
+interface Ethernet1/40
+
+interface Ethernet1/41
+
+interface Ethernet1/42
+
+interface Ethernet1/43
+
+interface Ethernet1/44
+
+interface Ethernet1/45
+
+interface Ethernet1/46
+
+interface Ethernet1/47
+
+interface Ethernet1/48
+
+interface Ethernet1/49
+
+interface Ethernet1/50
+
+interface Ethernet1/51
+
+interface Ethernet1/52
+
+interface Ethernet1/53
+
+interface Ethernet1/54
+
+interface Ethernet1/55
+
+interface Ethernet1/56
+
+interface Ethernet1/57
+
+interface Ethernet1/58
+
+interface Ethernet1/59
+
+interface Ethernet1/60
+
+interface Ethernet1/61
+
+interface Ethernet1/62
+
+interface Ethernet1/63
+
+interface Ethernet1/64
+
+interface Ethernet1/65
+
+interface Ethernet1/66
+
+interface Ethernet1/67
+
+interface Ethernet1/68
+
+interface Ethernet1/69
+
+interface Ethernet1/70
+
+interface Ethernet1/71
+
+interface Ethernet1/72
+
+interface Ethernet1/73
+
+interface Ethernet1/74
+
+interface Ethernet1/75
+
+interface Ethernet1/76
+
+interface Ethernet1/77
+
+interface Ethernet1/78
+
+interface Ethernet1/79
+
+interface Ethernet1/80
+
+interface Ethernet1/81
+
+interface Ethernet1/82
+
+interface Ethernet1/83
+
+interface Ethernet1/84
+
+interface Ethernet1/85
+
+interface Ethernet1/86
+
+interface Ethernet1/87
+
+interface Ethernet1/88
+
+interface Ethernet1/89
+
+interface Ethernet1/90
+
+interface Ethernet1/91
+
+interface Ethernet1/92
+
+interface Ethernet1/93
+
+interface Ethernet1/94
+
+interface Ethernet1/95
+
+interface Ethernet1/96
+
+interface Ethernet1/97
+
+interface Ethernet1/98
+
+interface Ethernet1/99
+
+interface Ethernet1/100
+
+interface Ethernet1/101
+
+interface Ethernet1/102
+
+interface Ethernet1/103
+
+interface Ethernet1/104
+
+interface Ethernet1/105
+
+interface Ethernet1/106
+
+interface Ethernet1/107
+
+interface Ethernet1/108
+
+interface Ethernet1/109
+
+interface Ethernet1/110
+
+interface Ethernet1/111
+
+interface Ethernet1/112
+
+interface Ethernet1/113
+
+interface Ethernet1/114
+
+interface Ethernet1/115
+
+interface Ethernet1/116
+
+interface Ethernet1/117
+
+interface Ethernet1/118
+
+interface Ethernet1/119
+
+interface Ethernet1/120
+
+interface Ethernet1/121
+
+interface Ethernet1/122
+
+interface Ethernet1/123
+
+interface Ethernet1/124
+
+interface Ethernet1/125
+
+interface Ethernet1/126
+
+interface Ethernet1/127
+
+interface Ethernet1/128
 
 interface mgmt0
   description OOB Management
-  ! Configured on launch
-  no ip address
-  no shutdown
   vrf member management
-
-
+  ip address 172.16.30.105/24
 line console
 line vty
+no feature signature-verification
+
+
 
 </entry>
         </extensions>
@@ -1564,45 +4217,384 @@ line vty
         <extensions>
             <entry key="AutoNetkit.ASN" type="Integer">1</entry>
             <entry key="static_ip" type="String">172.16.30.106</entry>
-            <entry key="config">!
-!
+            <entry key="config">!Command: show running-config
+!Running configuration last done at: Mon Jan 20 18:54:09 2020
+!Time: Mon Jan 20 18:56:30 2020
+
+version 9.2(2) Bios:version  
 hostname leaf02-2
-vdc nx id 1
+vdc leaf02-2 id 1
   limit-resource vlan minimum 16 maximum 4094
   limit-resource vrf minimum 2 maximum 4096
-  limit-resource port-channel minimum 0 maximum 768
-  limit-resource u4route-mem minimum 96 maximum 96
-  limit-resource u6route-mem minimum 24 maximum 24
+  limit-resource port-channel minimum 0 maximum 511
+  limit-resource u4route-mem minimum 128 maximum 128
+  limit-resource u6route-mem minimum 96 maximum 96
   limit-resource m4route-mem minimum 58 maximum 58
   limit-resource m6route-mem minimum 8 maximum 8
 
 feature telnet
-feature ssh
+cfs eth distribute
+feature lacp
+feature vpc
 
 no password strength-check
-username admin password 5 $1$KuOSBsvW$Cy0TSD..gEBGBPjzpDgf51 role network-admin
-username cisco password 5 $1$Nk7ZkwH0$fyiRmMMfIheqE3BqvcL0C1 role network-operator
+username admin password 5 $1$KuOSBsvW$Cy0TSD..gEBGBPjzpDgf51  role network-admin
+username cisco password 5 $1$Nk7ZkwH0$fyiRmMMfIheqE3BqvcL0C1  role network-operator
 username cisco role network-admin
 no ip domain-lookup
+rmon event 1 description FATAL(1) owner PMON@FATAL
+rmon event 2 description CRITICAL(2) owner PMON@CRITICAL
+rmon event 3 description ERROR(3) owner PMON@ERROR
+rmon event 4 description WARNING(4) owner PMON@WARNING
+rmon event 5 description INFORMATION(5) owner PMON@INFO
 
-
-vlan 1
+vlan 1,10-12,100-103,201-203,900-901,3001
+vlan 10
+  name trusted-transit
+vlan 11
+  name admin-systems
+vlan 12
+  name mgmt
+vlan 100
+  name dmz-transit
+vlan 101
+  name prod-web
+vlan 102
+  name prod-app
+vlan 103
+  name prod-data
+vlan 201
+  name dev-web
+vlan 202
+  name dev-app
+vlan 203
+  name dev-data
+vlan 900
+  name guest-transit
+vlan 901
+  name hotspot
+vlan 3001
+  name backdoor-temp
 
 vrf context management
   ip route 0.0.0.0/0 172.16.30.254
-
 hardware forwarding unicast trace
+vpc domain 11
+  peer-switch
+  peer-keepalive destination 172.16.30.105 source 172.16.30.106
+  peer-gateway
+
+
+interface port-channel1
+  switchport mode trunk
+  spanning-tree port type network
+  vpc peer-link
+
+interface port-channel2
+  description Interswitch Fabric Link
+  switchport mode trunk
+  mtu 9216
+  vpc 2
+
+interface port-channel3
+  description Interswitch Fabric Link
+  switchport mode trunk
+  mtu 9216
+  vpc 3
+
+interface port-channel4
+  description Interswitch Fabric Link
+  switchport mode trunk
+  mtu 9216
+  vpc 4
+
+interface Ethernet1/1
+  description VPC Peer Link
+  switchport mode trunk
+  channel-group 1 mode active
+
+interface Ethernet1/2
+  description VPC Peer Link
+  switchport mode trunk
+  channel-group 1 mode active
+
+interface Ethernet1/3
+  description Interswitch Fabric Link
+  switchport mode trunk
+  mtu 9216
+  channel-group 2 mode active
+
+interface Ethernet1/4
+  description Interswitch Fabric Link
+  switchport mode trunk
+  mtu 9216
+  channel-group 2 mode active
+
+interface Ethernet1/5
+  description Interswitch Fabric Link
+  switchport mode trunk
+  mtu 9216
+  channel-group 4 mode active
+
+interface Ethernet1/6
+  description Interswitch Fabric Link
+  switchport mode trunk
+  mtu 9216
+  channel-group 3 mode active
+
+interface Ethernet1/7
+
+interface Ethernet1/8
+
+interface Ethernet1/9
+
+interface Ethernet1/10
+
+interface Ethernet1/11
+
+interface Ethernet1/12
+
+interface Ethernet1/13
+
+interface Ethernet1/14
+
+interface Ethernet1/15
+
+interface Ethernet1/16
+
+interface Ethernet1/17
+
+interface Ethernet1/18
+
+interface Ethernet1/19
+
+interface Ethernet1/20
+
+interface Ethernet1/21
+
+interface Ethernet1/22
+
+interface Ethernet1/23
+
+interface Ethernet1/24
+
+interface Ethernet1/25
+
+interface Ethernet1/26
+
+interface Ethernet1/27
+
+interface Ethernet1/28
+
+interface Ethernet1/29
+
+interface Ethernet1/30
+
+interface Ethernet1/31
+
+interface Ethernet1/32
+
+interface Ethernet1/33
+
+interface Ethernet1/34
+
+interface Ethernet1/35
+
+interface Ethernet1/36
+
+interface Ethernet1/37
+
+interface Ethernet1/38
+
+interface Ethernet1/39
+
+interface Ethernet1/40
+
+interface Ethernet1/41
+
+interface Ethernet1/42
+
+interface Ethernet1/43
+
+interface Ethernet1/44
+
+interface Ethernet1/45
+
+interface Ethernet1/46
+
+interface Ethernet1/47
+
+interface Ethernet1/48
+
+interface Ethernet1/49
+
+interface Ethernet1/50
+
+interface Ethernet1/51
+
+interface Ethernet1/52
+
+interface Ethernet1/53
+
+interface Ethernet1/54
+
+interface Ethernet1/55
+
+interface Ethernet1/56
+
+interface Ethernet1/57
+
+interface Ethernet1/58
+
+interface Ethernet1/59
+
+interface Ethernet1/60
+
+interface Ethernet1/61
+
+interface Ethernet1/62
+
+interface Ethernet1/63
+
+interface Ethernet1/64
+
+interface Ethernet1/65
+
+interface Ethernet1/66
+
+interface Ethernet1/67
+
+interface Ethernet1/68
+
+interface Ethernet1/69
+
+interface Ethernet1/70
+
+interface Ethernet1/71
+
+interface Ethernet1/72
+
+interface Ethernet1/73
+
+interface Ethernet1/74
+
+interface Ethernet1/75
+
+interface Ethernet1/76
+
+interface Ethernet1/77
+
+interface Ethernet1/78
+
+interface Ethernet1/79
+
+interface Ethernet1/80
+
+interface Ethernet1/81
+
+interface Ethernet1/82
+
+interface Ethernet1/83
+
+interface Ethernet1/84
+
+interface Ethernet1/85
+
+interface Ethernet1/86
+
+interface Ethernet1/87
+
+interface Ethernet1/88
+
+interface Ethernet1/89
+
+interface Ethernet1/90
+
+interface Ethernet1/91
+
+interface Ethernet1/92
+
+interface Ethernet1/93
+
+interface Ethernet1/94
+
+interface Ethernet1/95
+
+interface Ethernet1/96
+
+interface Ethernet1/97
+
+interface Ethernet1/98
+
+interface Ethernet1/99
+
+interface Ethernet1/100
+
+interface Ethernet1/101
+
+interface Ethernet1/102
+
+interface Ethernet1/103
+
+interface Ethernet1/104
+
+interface Ethernet1/105
+
+interface Ethernet1/106
+
+interface Ethernet1/107
+
+interface Ethernet1/108
+
+interface Ethernet1/109
+
+interface Ethernet1/110
+
+interface Ethernet1/111
+
+interface Ethernet1/112
+
+interface Ethernet1/113
+
+interface Ethernet1/114
+
+interface Ethernet1/115
+
+interface Ethernet1/116
+
+interface Ethernet1/117
+
+interface Ethernet1/118
+
+interface Ethernet1/119
+
+interface Ethernet1/120
+
+interface Ethernet1/121
+
+interface Ethernet1/122
+
+interface Ethernet1/123
+
+interface Ethernet1/124
+
+interface Ethernet1/125
+
+interface Ethernet1/126
+
+interface Ethernet1/127
+
+interface Ethernet1/128
 
 interface mgmt0
   description OOB Management
-  ! Configured on launch
-  no ip address
-  no shutdown
   vrf member management
-
-
+  ip address 172.16.30.106/24
 line console
 line vty
+no feature signature-verification
+
+
 
 </entry>
         </extensions>
@@ -1618,83 +4610,214 @@ line vty
             <entry key="AutoNetkit.ASN" type="Integer">1</entry>
             <entry key="static_ip" type="String">172.16.30.115</entry>
             <entry key="config" type="String">!
-    !
-    version 15.2
-    service timestamps debug datetime msec
-    service timestamps log datetime msec
-    no service password-encryption
-    service compress-config
-    no service config
-    enable password cisco
-    ip classless
-    ip subnet-zero
-    no ip domain lookup
-    username cisco privilege 15 secret cisco
-    !
-    line vty 0 4
-    transport input ssh telnet
-    exec-timeout 720 0
-    password cisco
-    login local
-    !
-    line con 0
-    password cisco
-    !
-    hostname vm-sw02
-    !
-    boot-start-marker
-    boot-end-marker
-    !
-    !
-    !
-    no aaa new-model
-    !
-    vtp mode transparent
-    !
-    cdp run
-    !
-    ip cef
-    no ipv6 cef
-    !
-    !
-    spanning-tree mode rapid-pvst
-    spanning-tree extend system-id
-    !
-    vlan internal allocation policy ascending
-    !
-    !
-    !
-    !
-    vrf definition Mgmt-intf
-    !
-    address-family ipv4
-    exit-address-family
-    !
-    address-family ipv6
-    exit-address-family
-    !
-    !
-    interface GigabitEthernet0/0
-    description OOB management
-    ! Configured on launch
-    no switchport
-    vrf forwarding Mgmt-intf
-    no ip address
-    no shutdown
-    !
-    !
-    ip forward-protocol nd
-    !
-    no ip http server
-    no ip http secure-server
-    !
-    control-plane
-    !
-    ip route vrf Mgmt-intf 0.0.0.0 0.0.0.0 172.16.30.254
-    ip domain-name lab.intra
-    crypto key generate rsa general-keys modulus 1024    
-    end
-          </entry>
+! Last configuration change at 16:55:20 UTC Mon Jan 20 2020 by cisco
+!
+version 15.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+service compress-config
+!
+hostname vm-sw02
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition Mgmt-intf
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+enable password cisco
+!
+username cisco privilege 15 secret 5 $1$xLEP$R0wyCR3aeOU4FmftlAcVZ/
+no aaa new-model
+!
+!
+!
+!
+!
+vtp mode transparent
+!
+!
+!
+no ip domain-lookup
+ip domain-name lab.intra
+ip cef
+no ipv6 cef
+!
+!
+!
+spanning-tree mode rapid-pvst
+spanning-tree extend system-id
+!
+!
+vlan 10
+ name trusted-transit
+!
+vlan 11
+ name admin-systems
+!
+vlan 12
+ name mgmt
+!
+vlan 100
+ name dmz-transit
+!
+vlan 101
+ name prod-web
+!
+vlan 102
+ name prod-app
+!
+vlan 103
+ name prod-data
+!
+vlan 201
+ name dev-web
+!
+vlan 202
+ name dev-app
+!
+vlan 203
+ name dev-data
+!
+vlan 900
+ name guest-transit
+!
+vlan 901
+ name hotspot
+!
+vlan 3001
+ name backdoor-temp
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Port-channel2
+ description Interswitch Fabric Link
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+interface GigabitEthernet0/0
+ description OOB management
+ no switchport
+ vrf forwarding Mgmt-intf
+ ip address 172.16.30.115 255.255.255.0
+ negotiation auto
+!
+interface GigabitEthernet0/1
+ description Interswitch Fabric Link
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ no negotiation auto
+ channel-group 2 mode active
+!
+interface GigabitEthernet0/2
+ description Interswitch Fabric Link
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ no negotiation auto
+ channel-group 2 mode active
+!
+interface GigabitEthernet0/3
+ description dev-web01
+ switchport access vlan 201
+ switchport trunk encapsulation dot1q
+ switchport mode access
+ no negotiation auto
+!
+interface GigabitEthernet1/0
+ description guest-01
+ switchport access vlan 901
+ switchport trunk encapsulation dot1q
+ switchport mode access
+ no negotiation auto
+!
+interface GigabitEthernet1/1
+ description prod-data01
+ switchport access vlan 103
+ switchport trunk encapsulation dot1q
+ switchport mode access
+ no negotiation auto
+!
+interface GigabitEthernet1/2
+ description admin-mgmt01
+ switchport access vlan 12
+ switchport trunk encapsulation dot1q
+ switchport mode access
+ no negotiation auto
+!
+ip forward-protocol nd
+!
+no ip http server
+!
+ip route vrf Mgmt-intf 0.0.0.0 0.0.0.0 172.16.30.254
+ip ssh server algorithm encryption aes128-ctr aes192-ctr aes256-ctr
+ip ssh client algorithm encryption aes128-ctr aes192-ctr aes256-ctr
+!
+!
+!
+!
+!
+!
+control-plane
+!
+banner exec `
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************`
+banner incoming `
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************`
+banner login `
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************`
+!
+line con 0
+ password cisco
+line aux 0
+line vty 0 4
+ exec-timeout 720 0
+ password cisco
+ login local
+ transport input telnet ssh
+!
+!
+end
+
+</entry>
         </extensions>
         <interface id="0" name="GigabitEthernet0/1"/>
         <interface id="1" name="GigabitEthernet0/2"/>
@@ -1911,8 +5034,8 @@ line vty
             <entry key="AutoNetkit.ASN" type="Integer">1</entry>
             <entry key="static_ip" type="String">172.16.30.101</entry>
             <entry key="config">!Command: show running-config
-!Running configuration last done at: Sun Dec 15 17:20:51 2019
-!Time: Sun Dec 15 17:44:54 2019
+!Running configuration last done at: Mon Jan 20 18:53:41 2020
+!Time: Mon Jan 20 18:56:32 2020
 
 version 9.2(2) Bios:version  
 hostname spine01-1
@@ -1976,6 +5099,7 @@ vpc domain 12
   peer-switch
   peer-keepalive destination 172.16.30.102 source 172.16.30.101
   peer-gateway
+  auto-recovery
 
 
 interface port-channel1
@@ -2296,45 +5420,379 @@ no feature signature-verification
         <extensions>
             <entry key="AutoNetkit.ASN" type="Integer">1</entry>
             <entry key="static_ip" type="String">172.16.30.102</entry>
-            <entry key="config">!
-!
+            <entry key="config">!Command: show running-config
+!Running configuration last done at: Mon Jan 20 18:53:48 2020
+!Time: Mon Jan 20 18:56:31 2020
+
+version 9.2(2) Bios:version  
 hostname spine01-2
-vdc nx id 1
+vdc spine01-2 id 1
   limit-resource vlan minimum 16 maximum 4094
   limit-resource vrf minimum 2 maximum 4096
-  limit-resource port-channel minimum 0 maximum 768
-  limit-resource u4route-mem minimum 96 maximum 96
-  limit-resource u6route-mem minimum 24 maximum 24
+  limit-resource port-channel minimum 0 maximum 511
+  limit-resource u4route-mem minimum 128 maximum 128
+  limit-resource u6route-mem minimum 96 maximum 96
   limit-resource m4route-mem minimum 58 maximum 58
   limit-resource m6route-mem minimum 8 maximum 8
 
 feature telnet
-feature ssh
+cfs eth distribute
+feature lacp
+feature vpc
 
 no password strength-check
-username admin password 5 $1$KuOSBsvW$Cy0TSD..gEBGBPjzpDgf51 role network-admin
-username cisco password 5 $1$Nk7ZkwH0$fyiRmMMfIheqE3BqvcL0C1 role network-operator
+username admin password 5 $1$KuOSBsvW$Cy0TSD..gEBGBPjzpDgf51  role network-admin
+username cisco password 5 $1$Nk7ZkwH0$fyiRmMMfIheqE3BqvcL0C1  role network-operator
 username cisco role network-admin
 no ip domain-lookup
+rmon event 1 description FATAL(1) owner PMON@FATAL
+rmon event 2 description CRITICAL(2) owner PMON@CRITICAL
+rmon event 3 description ERROR(3) owner PMON@ERROR
+rmon event 4 description WARNING(4) owner PMON@WARNING
+rmon event 5 description INFORMATION(5) owner PMON@INFO
 
-
-vlan 1
+vlan 1,10-12,100-103,201-203,900-901,3001
+vlan 10
+  name trusted-transit
+vlan 11
+  name admin-systems
+vlan 12
+  name mgmt
+vlan 100
+  name dmz-transit
+vlan 101
+  name prod-web
+vlan 102
+  name prod-app
+vlan 103
+  name prod-data
+vlan 201
+  name dev-web
+vlan 202
+  name dev-app
+vlan 203
+  name dev-data
+vlan 900
+  name guest-transit
+vlan 901
+  name hotspot
+vlan 3001
+  name backdoor-temp
 
 vrf context management
   ip route 0.0.0.0/0 172.16.30.254
-
 hardware forwarding unicast trace
+vpc domain 12
+  peer-switch
+  peer-keepalive destination 172.16.30.101 source 172.16.30.102
+  peer-gateway
+
+
+interface port-channel1
+  switchport mode trunk
+  spanning-tree port type network
+  vpc peer-link
+
+interface port-channel11
+  description Interswitch Fabric Link
+  switchport mode trunk
+  mtu 9216
+  vpc 11
+
+interface port-channel12
+  description Interswitch Fabric Link
+  switchport mode trunk
+  mtu 9216
+  vpc 12
+
+interface Ethernet1/1
+  description VPC Peer Link
+  switchport mode trunk
+  channel-group 1 mode active
+
+interface Ethernet1/2
+  description VPC Peer Link
+  switchport mode trunk
+  channel-group 1 mode active
+
+interface Ethernet1/3
+  description Interswitch Fabric Link
+  switchport mode trunk
+  mtu 9216
+  channel-group 11 mode active
+
+interface Ethernet1/4
+  description Interswitch Fabric Link
+  switchport mode trunk
+  mtu 9216
+  channel-group 11 mode active
+
+interface Ethernet1/5
+  description Interswitch Fabric Link
+  switchport mode trunk
+  mtu 9216
+  channel-group 12 mode active
+
+interface Ethernet1/6
+  description Interswitch Fabric Link
+  switchport mode trunk
+  mtu 9216
+  channel-group 12 mode active
+
+interface Ethernet1/7
+
+interface Ethernet1/8
+
+interface Ethernet1/9
+
+interface Ethernet1/10
+
+interface Ethernet1/11
+
+interface Ethernet1/12
+
+interface Ethernet1/13
+
+interface Ethernet1/14
+
+interface Ethernet1/15
+
+interface Ethernet1/16
+
+interface Ethernet1/17
+
+interface Ethernet1/18
+
+interface Ethernet1/19
+
+interface Ethernet1/20
+
+interface Ethernet1/21
+
+interface Ethernet1/22
+
+interface Ethernet1/23
+
+interface Ethernet1/24
+
+interface Ethernet1/25
+
+interface Ethernet1/26
+
+interface Ethernet1/27
+
+interface Ethernet1/28
+
+interface Ethernet1/29
+
+interface Ethernet1/30
+
+interface Ethernet1/31
+
+interface Ethernet1/32
+
+interface Ethernet1/33
+
+interface Ethernet1/34
+
+interface Ethernet1/35
+
+interface Ethernet1/36
+
+interface Ethernet1/37
+
+interface Ethernet1/38
+
+interface Ethernet1/39
+
+interface Ethernet1/40
+
+interface Ethernet1/41
+
+interface Ethernet1/42
+
+interface Ethernet1/43
+
+interface Ethernet1/44
+
+interface Ethernet1/45
+
+interface Ethernet1/46
+
+interface Ethernet1/47
+
+interface Ethernet1/48
+
+interface Ethernet1/49
+
+interface Ethernet1/50
+
+interface Ethernet1/51
+
+interface Ethernet1/52
+
+interface Ethernet1/53
+
+interface Ethernet1/54
+
+interface Ethernet1/55
+
+interface Ethernet1/56
+
+interface Ethernet1/57
+
+interface Ethernet1/58
+
+interface Ethernet1/59
+
+interface Ethernet1/60
+
+interface Ethernet1/61
+
+interface Ethernet1/62
+
+interface Ethernet1/63
+
+interface Ethernet1/64
+
+interface Ethernet1/65
+
+interface Ethernet1/66
+
+interface Ethernet1/67
+
+interface Ethernet1/68
+
+interface Ethernet1/69
+
+interface Ethernet1/70
+
+interface Ethernet1/71
+
+interface Ethernet1/72
+
+interface Ethernet1/73
+
+interface Ethernet1/74
+
+interface Ethernet1/75
+
+interface Ethernet1/76
+
+interface Ethernet1/77
+
+interface Ethernet1/78
+
+interface Ethernet1/79
+
+interface Ethernet1/80
+
+interface Ethernet1/81
+
+interface Ethernet1/82
+
+interface Ethernet1/83
+
+interface Ethernet1/84
+
+interface Ethernet1/85
+
+interface Ethernet1/86
+
+interface Ethernet1/87
+
+interface Ethernet1/88
+
+interface Ethernet1/89
+
+interface Ethernet1/90
+
+interface Ethernet1/91
+
+interface Ethernet1/92
+
+interface Ethernet1/93
+
+interface Ethernet1/94
+
+interface Ethernet1/95
+
+interface Ethernet1/96
+
+interface Ethernet1/97
+
+interface Ethernet1/98
+
+interface Ethernet1/99
+
+interface Ethernet1/100
+
+interface Ethernet1/101
+
+interface Ethernet1/102
+
+interface Ethernet1/103
+
+interface Ethernet1/104
+
+interface Ethernet1/105
+
+interface Ethernet1/106
+
+interface Ethernet1/107
+
+interface Ethernet1/108
+
+interface Ethernet1/109
+
+interface Ethernet1/110
+
+interface Ethernet1/111
+
+interface Ethernet1/112
+
+interface Ethernet1/113
+
+interface Ethernet1/114
+
+interface Ethernet1/115
+
+interface Ethernet1/116
+
+interface Ethernet1/117
+
+interface Ethernet1/118
+
+interface Ethernet1/119
+
+interface Ethernet1/120
+
+interface Ethernet1/121
+
+interface Ethernet1/122
+
+interface Ethernet1/123
+
+interface Ethernet1/124
+
+interface Ethernet1/125
+
+interface Ethernet1/126
+
+interface Ethernet1/127
+
+interface Ethernet1/128
 
 interface mgmt0
   description OOB Management
-  ! Configured on launch
-  no ip address
-  no shutdown
   vrf member management
-
-
+  ip address 172.16.30.102/24
 line console
 line vty
+no feature signature-verification
+
+
+
 </entry>
         </extensions>
         <interface id="0" name="Ethernet1/1"/>
@@ -2651,83 +6109,203 @@ line vty
             <entry key="AutoNetkit.ASN" type="Integer">1</entry>
             <entry key="static_ip" type="String">172.16.30.122</entry>
             <entry key="config" type="String">!
-    !
-    version 15.2
-    service timestamps debug datetime msec
-    service timestamps log datetime msec
-    no service password-encryption
-    service compress-config
-    no service config
-    enable password cisco
-    ip classless
-    ip subnet-zero
-    no ip domain lookup
-    username cisco privilege 15 secret cisco
-    !
-    line vty 0 4
-    transport input ssh telnet
-    exec-timeout 720 0
-    password cisco
-    login local
-    !
-    line con 0
-    password cisco
-    !
-    hostname fw-inside-sw01
-    !
-    boot-start-marker
-    boot-end-marker
-    !
-    !
-    !
-    no aaa new-model
-    !
-    vtp mode transparent
-    !
-    cdp run
-    !
-    ip cef
-    no ipv6 cef
-    !
-    !
-    spanning-tree mode rapid-pvst
-    spanning-tree extend system-id
-    !
-    vlan internal allocation policy ascending
-    !
-    !
-    !
-    !
-    vrf definition Mgmt-intf
-    !
-    address-family ipv4
-    exit-address-family
-    !
-    address-family ipv6
-    exit-address-family
-    !
-    !
-    interface GigabitEthernet0/0
-    description OOB management
-    ! Configured on launch
-    no switchport
-    vrf forwarding Mgmt-intf
-    no ip address
-    no shutdown
-    !
-    !
-    ip forward-protocol nd
-    !
-    no ip http server
-    no ip http secure-server
-    !
-    control-plane
-    !
-    ip route vrf Mgmt-intf 0.0.0.0 0.0.0.0 172.16.30.254
-    ip domain-name lab.intra
-    crypto key generate rsa general-keys modulus 1024    
-    end
-          </entry>
+! Last configuration change at 17:26:53 UTC Mon Jan 20 2020 by cisco
+!
+version 15.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+service compress-config
+!
+hostname fw-inside-sw01
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition Mgmt-intf
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+enable password cisco
+!
+username cisco privilege 15 secret 5 $1$dmjL$D5vxcpbn6Mo6Mxk9VeZpe1
+no aaa new-model
+!
+!
+!
+!
+!
+vtp mode transparent
+!
+!
+!
+no ip domain-lookup
+ip domain-name lab.intra
+ip cef
+no ipv6 cef
+!
+!
+!
+spanning-tree mode rapid-pvst
+spanning-tree extend system-id
+!
+!
+vlan 10
+ name trusted-transit
+!
+vlan 11
+ name admin-systems
+!
+vlan 12
+ name mgmt
+!
+vlan 100
+ name dmz-transit
+!
+vlan 101
+ name prod-web
+!
+vlan 102
+ name prod-app
+!
+vlan 103
+ name prod-data
+!
+vlan 201
+ name dev-web
+!
+vlan 202
+ name dev-app
+!
+vlan 203
+ name dev-data
+!
+vlan 900
+ name guest-transit
+!
+vlan 901
+ name hotspot
+!
+vlan 3001
+ name backdoor-temp
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Port-channel2
+ description Interswitch Fabric Link
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+interface GigabitEthernet0/0
+ description OOB management
+ no switchport
+ vrf forwarding Mgmt-intf
+ ip address 172.16.30.122 255.255.255.0
+ negotiation auto
+!
+interface GigabitEthernet0/1
+ description Interswitch Fabric Link
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ no negotiation auto
+ channel-group 2 mode active
+!
+interface GigabitEthernet0/2
+ description Interswitch Fabric Link
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ no negotiation auto
+ channel-group 2 mode active
+!
+interface GigabitEthernet0/3
+ description fw01 interface g0/1
+ switchport trunk allowed vlan 10,100,900
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ no negotiation auto
+!
+interface GigabitEthernet1/0
+ description fw02 interface g0/1
+ switchport trunk allowed vlan 10,100,900
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ no negotiation auto
+!
+interface GigabitEthernet1/1
+ negotiation auto
+!
+ip forward-protocol nd
+!
+no ip http server
+!
+ip route vrf Mgmt-intf 0.0.0.0 0.0.0.0 172.16.30.254
+ip ssh server algorithm encryption aes128-ctr aes192-ctr aes256-ctr
+ip ssh client algorithm encryption aes128-ctr aes192-ctr aes256-ctr
+!
+!
+!
+!
+!
+!
+control-plane
+!
+banner exec `
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************`
+banner incoming `
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************`
+banner login `
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************`
+!
+line con 0
+ password cisco
+line aux 0
+line vty 0 4
+ exec-timeout 720 0
+ password cisco
+ login local
+ transport input telnet ssh
+!
+!
+end
+
+</entry>
         </extensions>
         <interface id="0" name="GigabitEthernet0/1"/>
         <interface id="1" name="GigabitEthernet0/2"/>
@@ -2740,83 +6318,167 @@ line vty
             <entry key="AutoNetkit.ASN" type="Integer">1</entry>
             <entry key="static_ip" type="String">172.16.30.123</entry>
             <entry key="config" type="String">!
-  !
-  version 15.2
-  service timestamps debug datetime msec
-  service timestamps log datetime msec
-  no service password-encryption
-  service compress-config
-  no service config
-  enable password cisco
-  ip classless
-  ip subnet-zero
-  no ip domain lookup
-  username cisco privilege 15 secret cisco
-  !
-  line vty 0 4
-  transport input ssh telnet
-  exec-timeout 720 0
-  password cisco
-  login local
-  !
-  line con 0
-  password cisco
-  !
-  hostname fw-outside-sw01
-  !
-  boot-start-marker
-  boot-end-marker
-  !
-  !
-  !
-  no aaa new-model
-  !
-  vtp mode transparent
-  !
-  cdp run
-  !
-  ip cef
-  no ipv6 cef
-  !
-  !
-  spanning-tree mode rapid-pvst
-  spanning-tree extend system-id
-  !
-  vlan internal allocation policy ascending
-  !
-  !
-  !
-  !
-  vrf definition Mgmt-intf
-  !
-   address-family ipv4
-   exit-address-family
-   !
-   address-family ipv6
-   exit-address-family
-  !
-  !
-  interface GigabitEthernet0/0
-    description OOB management
-    ! Configured on launch
-    no switchport
-    vrf forwarding Mgmt-intf
-    no ip address
-    no shutdown
-  !
-  !
-  ip forward-protocol nd
-  !
-  no ip http server
-  no ip http secure-server
-  !
-  control-plane
-  !
-  ip route vrf Mgmt-intf 0.0.0.0 0.0.0.0 172.16.30.254
-  ip domain-name lab.intra
-  crypto key generate rsa general-keys modulus 1024    
-  end
-          </entry>
+! Last configuration change at 17:34:19 UTC Mon Jan 20 2020 by cisco
+!
+version 15.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+service compress-config
+!
+hostname fw-outside-sw01
+!
+boot-start-marker
+boot-end-marker
+!
+!
+vrf definition Mgmt-intf
+ !
+ address-family ipv4
+ exit-address-family
+ !
+ address-family ipv6
+ exit-address-family
+!
+enable password cisco
+!
+username cisco privilege 15 secret 5 $1$iLca$5Wx/t7xkqnSiG7nP4v1bw0
+no aaa new-model
+!
+!
+!
+!
+!
+vtp mode transparent
+!
+!
+!
+no ip domain-lookup
+ip domain-name lab.intra
+ip cef
+no ipv6 cef
+!
+!
+!
+spanning-tree mode rapid-pvst
+spanning-tree extend system-id
+!
+!
+vlan 11
+ name outside-admin-fw
+!
+! 
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+!
+interface Port-channel2
+ description Interswitch Fabric Link
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+!
+interface GigabitEthernet0/0
+ description OOB management
+ no switchport
+ vrf forwarding Mgmt-intf
+ ip address 172.16.30.123 255.255.255.0
+ negotiation auto
+!
+interface GigabitEthernet0/1
+ description Interswitch Fabric Link
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ no negotiation auto
+ channel-group 2 mode active
+!
+interface GigabitEthernet0/2
+ description Interswitch Fabric Link
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ no negotiation auto
+ channel-group 2 mode active
+!
+interface GigabitEthernet0/3
+ description fw01 interface g0/0
+ switchport trunk allowed vlan 11
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ no negotiation auto
+!
+interface GigabitEthernet1/0
+ description fw02 interface g0/0
+ switchport trunk allowed vlan 11
+ switchport trunk encapsulation dot1q
+ switchport mode trunk
+ no negotiation auto
+!
+interface GigabitEthernet1/1
+ negotiation auto
+!
+ip forward-protocol nd
+!
+no ip http server
+!
+ip route vrf Mgmt-intf 0.0.0.0 0.0.0.0 172.16.30.254
+ip ssh server algorithm encryption aes128-ctr aes192-ctr aes256-ctr
+ip ssh client algorithm encryption aes128-ctr aes192-ctr aes256-ctr
+!
+!
+!
+!
+!
+!
+control-plane
+!
+banner exec `
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************`
+banner incoming `
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************`
+banner login `
+**************************************************************************
+* IOSv is strictly limited to use for evaluation, demonstration and IOS  *
+* education. IOSv is provided as-is and is not supported by Cisco's      *
+* Technical Advisory Center. Any use or disclosure, in whole or in part, *
+* of the IOSv Software or Documentation to any third party for any       *
+* purposes is expressly prohibited except as otherwise authorized by     *
+* Cisco in writing.                                                      *
+**************************************************************************`
+!
+line con 0
+ password cisco
+line aux 0
+line vty 0 4
+ exec-timeout 720 0
+ password cisco
+ login local
+ transport input telnet ssh
+!
+!
+end
+
+</entry>
         </extensions>
         <interface id="0" name="GigabitEthernet0/1"/>
         <interface id="1" name="GigabitEthernet0/2"/>
@@ -2828,44 +6490,13 @@ line vty
         <extensions>
             <entry key="static_ip" type="String">172.16.30.146</entry>
             <entry key="config" type="String">!
+ASA Version 9.9(2) 
 !
+terminal width 511
 hostname fw02
-terminal width 0
-username cisco password cisco privilege 15
-enable password cisco
+enable password $sha512$5000$Cek+qzsuJtgVCU4pXfM2wg==$jNTArxwcQGhbTVH+iG73RQ== pbkdf2
 names
-interface Management0/0
-description OOB Management
-duplex full
-management-only
-nameif mgmt
-security-level 100
-no shutdown
-! Configured on launch
-no ip address
-!
-access-list global_access line 1 remark Allow Ping
-  access-list global_access line 2 extended permit icmp any any
-access-group global_access global
-route mgmt 0.0.0.0 0.0.0.0 172.16.30.254
-!
-aaa authentication ssh console LOCAL
-aaa authentication telnet console LOCAL
-aaa authorization exec LOCAL auto-enable
-http server enable
-http 0.0.0.0 0.0.0.0 mgmt
-ssh 0.0.0.0 0.0.0.0 mgmt
-telnet 0.0.0.0 0.0.0.0 mgmt
-http 0.0.0.0 0.0.0.0 outside
-ssh 0.0.0.0 0.0.0.0 outside
-telnet 0.0.0.0 0.0.0.0 outside
-http 0.0.0.0 0.0.0.0 outside-1
-ssh 0.0.0.0 0.0.0.0 outside-1
-telnet 0.0.0.0 0.0.0.0 outside-1
-ssh version 2
-crypto key generate rsa modulus 1024
-telnet timeout 15
-console timeout 0
+
 !
 interface GigabitEthernet0/0
  shutdown
@@ -2879,15 +6510,28 @@ interface GigabitEthernet0/1
  no security-level
  no ip address
 !
+interface Management0/0
+ description OOB Management
+ duplex full
+ management-only
+ nameif mgmt
+ security-level 100
+ ip address 172.16.30.146 255.255.255.0 
 !
 ftp mode passive
+access-list global_access remark Allow Ping
+access-list global_access extended permit icmp any4 any4 
 pager lines 23
+mtu mgmt 1500
 no failover
+no monitor-interface service-module 
 icmp unreachable rate-limit 1 burst-size 1
 no asdm history enable
 arp timeout 14400
 no arp permit-nonconnected
 arp rate-limit 8192
+access-group global_access global
+route mgmt 0.0.0.0 0.0.0.0 172.16.30.254 1
 timeout xlate 3:00:00
 timeout pat-xlate 0:00:30
 timeout conn 1:00:00 half-closed 0:10:00 udp 0:02:00 sctp 0:02:00 icmp 0:00:02
@@ -2899,7 +6543,13 @@ timeout floating-conn 0:00:00
 timeout conn-holddown 0:00:15
 timeout igp stale-route 0:01:10
 user-identity default-domain LOCAL
+aaa authentication ssh console LOCAL 
+aaa authentication telnet console LOCAL 
+aaa authorization exec LOCAL auto-enable
+aaa authorization http console LOCAL
 aaa authentication login-history
+http server enable
+http 0.0.0.0 0.0.0.0 mgmt
 no snmp-server location
 no snmp-server contact
 crypto ipsec security-association pmtu-aging infinite
@@ -2910,51 +6560,53 @@ crypto ca trustpool policy
  auto-import
 crypto ca certificate chain _SmartCallHome_ServerCA
  certificate ca 513fb9743870b73440418d30930699ff
-    30820538 30820420 a0030201 02021051 3fb97438 70b73440 418d3093 0699ff30
-    0d06092a 864886f7 0d01010b 05003081 ca310b30 09060355 04061302 55533117
-    30150603 55040a13 0e566572 69536967 6e2c2049 6e632e31 1f301d06 0355040b
-    13165665 72695369 676e2054 72757374 204e6574 776f726b 313a3038 06035504
-    0b133128 63292032 30303620 56657269 5369676e 2c20496e 632e202d 20466f72
-    20617574 686f7269 7a656420 75736520 6f6e6c79 31453043 06035504 03133c56
-    65726953 69676e20 436c6173 73203320 5075626c 69632050 72696d61 72792043
-    65727469 66696361 74696f6e 20417574 686f7269 7479202d 20473530 1e170d31
-    33313033 31303030 3030305a 170d3233 31303330 32333539 35395a30 7e310b30
-    09060355 04061302 5553311d 301b0603 55040a13 1453796d 616e7465 6320436f
-    72706f72 6174696f 6e311f30 1d060355 040b1316 53796d61 6e746563 20547275
-    7374204e 6574776f 726b312f 302d0603 55040313 2653796d 616e7465 6320436c
-    61737320 33205365 63757265 20536572 76657220 4341202d 20473430 82012230
-    0d06092a 864886f7 0d010101 05000382 010f0030 82010a02 82010100 b2d805ca
-    1c742db5 175639c5 4a520996 e84bd80c f1689f9a 422862c3 a530537e 5511825b
-    037a0d2f e17904c9 b4967719 81019459 f9bcf77a 9927822d b783dd5a 277fb203
-    7a9c5325 e9481f46 4fc89d29 f8be7956 f6f7fdd9 3a68da8b 4b823341 12c3c83c
-    ccd6967a 84211a22 04032717 8b1c6861 930f0e51 80331db4 b5ceeb7e d062acee
-    b37b0174 ef6935eb cad53da9 ee9798ca 8daa440e 25994a15 96a4ce6d 02541f2a
-    6a26e206 3a6348ac b44cd175 9350ff13 2fd6dae1 c618f59f c9255df3 003ade26
-    4db42909 cd0f3d23 6f164a81 16fbf283 10c3b8d6 d855323d f1bd0fbd 8c52954a
-    16977a52 2163752f 16f9c466 bef5b509 d8ff2700 cd447c6f 4b3fb0f7 02030100
-    01a38201 63308201 5f301206 03551d13 0101ff04 08300601 01ff0201 00303006
-    03551d1f 04293027 3025a023 a021861f 68747470 3a2f2f73 312e7379 6d63622e
-    636f6d2f 70636133 2d67352e 63726c30 0e060355 1d0f0101 ff040403 02010630
-    2f06082b 06010505 07010104 23302130 1f06082b 06010505 07300186 13687474
-    703a2f2f 73322e73 796d6362 2e636f6d 306b0603 551d2004 64306230 60060a60
-    86480186 f8450107 36305230 2606082b 06010505 07020116 1a687474 703a2f2f
-    7777772e 73796d61 7574682e 636f6d2f 63707330 2806082b 06010505 07020230
-    1c1a1a68 7474703a 2f2f7777 772e7379 6d617574 682e636f 6d2f7270 61302906
-    03551d11 04223020 a41e301c 311a3018 06035504 03131153 796d616e 74656350
-    4b492d31 2d353334 301d0603 551d0e04 1604145f 60cf6190 55df8443 148a602a
-    b2f57af4 4318ef30 1f060355 1d230418 30168014 7fd365a7 c2ddecbb f03009f3
-    4339fa02 af333133 300d0609 2a864886 f70d0101 0b050003 82010100 5e945649
-    dd8e2d65 f5c13651 b603e3da 9e7319f2 1f59ab58 7e6c2605 2cfa81d7 5c231722
-    2c3793f7 86ec85e6 b0a3fd1f e232a845 6fe1d9fb b9afd270 a0324265 bf84fe16
-    2a8f3fc5 a6d6a393 7d43e974 21913528 f463e92e edf7f55c 7f4b9ab5 20e90abd
-    e045100c 14949a5d a5e34b91 e8249b46 4065f422 72cd99f8 8811f5f3 7fe63382
-    e6a8c57e fed008e2 25580871 68e6cda2 e614de4e 52242dfd e5791353 e75e2f2d
-    4d1b6d40 15522bf7 87897812 816ed94d aa2d78d4 c22c3d08 5f87919e 1f0eb0de
-    30526486 89aa9d66 9c0e760c 80f274d8 2af8b83a ced7d60f 11be6bab 14f5bd41
+    30820538 30820420 a0030201 02021051 3fb97438 70b73440 418d3093 0699ff30 
+    0d06092a 864886f7 0d01010b 05003081 ca310b30 09060355 04061302 55533117 
+    30150603 55040a13 0e566572 69536967 6e2c2049 6e632e31 1f301d06 0355040b 
+    13165665 72695369 676e2054 72757374 204e6574 776f726b 313a3038 06035504 
+    0b133128 63292032 30303620 56657269 5369676e 2c20496e 632e202d 20466f72 
+    20617574 686f7269 7a656420 75736520 6f6e6c79 31453043 06035504 03133c56 
+    65726953 69676e20 436c6173 73203320 5075626c 69632050 72696d61 72792043 
+    65727469 66696361 74696f6e 20417574 686f7269 7479202d 20473530 1e170d31 
+    33313033 31303030 3030305a 170d3233 31303330 32333539 35395a30 7e310b30 
+    09060355 04061302 5553311d 301b0603 55040a13 1453796d 616e7465 6320436f 
+    72706f72 6174696f 6e311f30 1d060355 040b1316 53796d61 6e746563 20547275 
+    7374204e 6574776f 726b312f 302d0603 55040313 2653796d 616e7465 6320436c 
+    61737320 33205365 63757265 20536572 76657220 4341202d 20473430 82012230 
+    0d06092a 864886f7 0d010101 05000382 010f0030 82010a02 82010100 b2d805ca 
+    1c742db5 175639c5 4a520996 e84bd80c f1689f9a 422862c3 a530537e 5511825b 
+    037a0d2f e17904c9 b4967719 81019459 f9bcf77a 9927822d b783dd5a 277fb203 
+    7a9c5325 e9481f46 4fc89d29 f8be7956 f6f7fdd9 3a68da8b 4b823341 12c3c83c 
+    ccd6967a 84211a22 04032717 8b1c6861 930f0e51 80331db4 b5ceeb7e d062acee 
+    b37b0174 ef6935eb cad53da9 ee9798ca 8daa440e 25994a15 96a4ce6d 02541f2a 
+    6a26e206 3a6348ac b44cd175 9350ff13 2fd6dae1 c618f59f c9255df3 003ade26 
+    4db42909 cd0f3d23 6f164a81 16fbf283 10c3b8d6 d855323d f1bd0fbd 8c52954a 
+    16977a52 2163752f 16f9c466 bef5b509 d8ff2700 cd447c6f 4b3fb0f7 02030100 
+    01a38201 63308201 5f301206 03551d13 0101ff04 08300601 01ff0201 00303006 
+    03551d1f 04293027 3025a023 a021861f 68747470 3a2f2f73 312e7379 6d63622e 
+    636f6d2f 70636133 2d67352e 63726c30 0e060355 1d0f0101 ff040403 02010630 
+    2f06082b 06010505 07010104 23302130 1f06082b 06010505 07300186 13687474 
+    703a2f2f 73322e73 796d6362 2e636f6d 306b0603 551d2004 64306230 60060a60 
+    86480186 f8450107 36305230 2606082b 06010505 07020116 1a687474 703a2f2f 
+    7777772e 73796d61 7574682e 636f6d2f 63707330 2806082b 06010505 07020230 
+    1c1a1a68 7474703a 2f2f7777 772e7379 6d617574 682e636f 6d2f7270 61302906 
+    03551d11 04223020 a41e301c 311a3018 06035504 03131153 796d616e 74656350 
+    4b492d31 2d353334 301d0603 551d0e04 1604145f 60cf6190 55df8443 148a602a 
+    b2f57af4 4318ef30 1f060355 1d230418 30168014 7fd365a7 c2ddecbb f03009f3 
+    4339fa02 af333133 300d0609 2a864886 f70d0101 0b050003 82010100 5e945649 
+    dd8e2d65 f5c13651 b603e3da 9e7319f2 1f59ab58 7e6c2605 2cfa81d7 5c231722 
+    2c3793f7 86ec85e6 b0a3fd1f e232a845 6fe1d9fb b9afd270 a0324265 bf84fe16 
+    2a8f3fc5 a6d6a393 7d43e974 21913528 f463e92e edf7f55c 7f4b9ab5 20e90abd 
+    e045100c 14949a5d a5e34b91 e8249b46 4065f422 72cd99f8 8811f5f3 7fe63382 
+    e6a8c57e fed008e2 25580871 68e6cda2 e614de4e 52242dfd e5791353 e75e2f2d 
+    4d1b6d40 15522bf7 87897812 816ed94d aa2d78d4 c22c3d08 5f87919e 1f0eb0de 
+    30526486 89aa9d66 9c0e760c 80f274d8 2af8b83a ced7d60f 11be6bab 14f5bd41 
     a0226389 f1ba0f6f 2963662d 3fac8c72 c5fbc7e4 d40ff23b 4f8c29c7
   quit
+telnet 0.0.0.0 0.0.0.0 mgmt
 telnet timeout 5
 ssh stricthostkeycheck
+ssh 0.0.0.0 0.0.0.0 mgmt
 ssh timeout 5
 ssh version 2
 ssh key-exchange group dh-group14-sha1
@@ -2964,6 +6616,7 @@ threat-detection basic-threat
 threat-detection statistics access-list
 no threat-detection statistics tcp-intercept
 dynamic-access-policy-record DfltAccessPolicy
+username cisco password $sha512$5000$LpoxHAvH0qr6amBUEh/4yA==$rXw5nLuLfaJq5BPQQ+YM8Q== pbkdf2 privilege 15
 !
 class-map inspection_default
  match default-inspection-traffic
@@ -2976,21 +6629,31 @@ policy-map type inspect dns preset_dns_map
   no tcp-inspection
 policy-map global_policy
  class inspection_default
-  inspect ip-options
-  inspect netbios
-  inspect rtsp
-  inspect sunrpc
-  inspect tftp
-  inspect xdmcp
-  inspect dns preset_dns_map
-  inspect ftp
-  inspect h323 h225
-  inspect h323 ras
-  inspect rsh
-  inspect esmtp
-  inspect sqlnet
-  inspect sip
-  inspect skinny
+  inspect ip-options 
+  inspect netbios 
+  inspect rtsp 
+  inspect sunrpc 
+  inspect tftp 
+  inspect xdmcp 
+  inspect dns preset_dns_map 
+  inspect ftp 
+  inspect h323 h225 
+  inspect h323 ras 
+  inspect rsh 
+  inspect esmtp 
+  inspect sqlnet 
+  inspect sip  
+  inspect skinny  
+policy-map type inspect dns migrated_dns_map_4
+ parameters
+  message-length maximum client auto
+  message-length maximum 512
+  no tcp-inspection
+policy-map type inspect dns migrated_dns_map_3
+ parameters
+  message-length maximum client auto
+  message-length maximum 512
+  no tcp-inspection
 policy-map type inspect dns migrated_dns_map_2
  parameters
   message-length maximum client auto
@@ -3003,11 +6666,8 @@ policy-map type inspect dns migrated_dns_map_1
   no tcp-inspection
 !
 service-policy global_policy global
-prompt hostname context
+prompt hostname context 
 call-home
- profile License
-  destination address http https://tools.cisco.com/its/service/oddce/services/DDCEService
-  destination transport-method http
  profile CiscoTAC-1
   no active
   destination address http https://tools.cisco.com/its/service/oddce/services/DDCEService
@@ -3018,6 +6678,9 @@ call-home
   subscribe-to-alert-group inventory periodic monthly
   subscribe-to-alert-group configuration periodic monthly
   subscribe-to-alert-group telemetry periodic daily
+ profile License
+  destination address http https://tools.cisco.com/its/service/oddce/services/DDCEService
+  destination transport-method http
 </entry>
         </extensions>
         <interface id="0" name="GigabitEthernet0/0"/>
@@ -3028,66 +6691,235 @@ call-home
             <entry key="AutoNetkit.ASN" type="Integer">1</entry>
             <entry key="static_ip" type="String">172.16.30.145</entry>
             <entry key="config">!
+ASA Version 9.9(2) 
 !
+terminal width 511
 hostname fw01
-terminal width 0
-username cisco password cisco privilege 15
-enable password cisco
+enable password $sha512$5000$duz5E3Zct4cVGhrEDvZ4lQ==$qWEqf3aJIejGIUSaQj5JhA== pbkdf2
 names
-interface Management0/0
-description OOB Management
-duplex full
-management-only
-nameif mgmt
-security-level 100
-no shutdown
-! Configured on launch
-no ip address
-!
-access-list global_access line 1 remark Allow Ping
-  access-list global_access line 2 extended permit icmp any any
-access-group global_access global
-route mgmt 0.0.0.0 0.0.0.0 172.16.30.254
-!
-aaa authentication ssh console LOCAL
-aaa authentication telnet console LOCAL
-aaa authorization exec LOCAL auto-enable
-http server enable
-http 0.0.0.0 0.0.0.0 mgmt
-ssh 0.0.0.0 0.0.0.0 mgmt
-telnet 0.0.0.0 0.0.0.0 mgmt
-http 0.0.0.0 0.0.0.0 outside
-ssh 0.0.0.0 0.0.0.0 outside
-telnet 0.0.0.0 0.0.0.0 outside
-http 0.0.0.0 0.0.0.0 outside-1
-ssh 0.0.0.0 0.0.0.0 outside-1
-telnet 0.0.0.0 0.0.0.0 outside-1
-ssh version 2
-crypto key generate rsa modulus 1024
-telnet timeout 15
-console timeout 0
+ip local pool AnyConnect-Pool 192.168.255.11-192.168.255.100 mask 255.255.255.0
+
 !
 interface GigabitEthernet0/0
- shutdown
  no nameif
  no security-level
  no ip address
+!
+interface GigabitEthernet0/0.11
+ vlan 11
+ nameif outside
+ security-level 0
+ ip address 10.225.250.12 255.255.255.248 
 !
 interface GigabitEthernet0/1
- shutdown
  no nameif
  no security-level
  no ip address
 !
+interface GigabitEthernet0/1.10
+ vlan 10
+ nameif inside
+ security-level 100
+ ip address 10.225.250.4 255.255.255.248 
+!
+interface GigabitEthernet0/1.100
+ vlan 100
+ nameif dmz
+ security-level 70
+ ip address 10.225.250.36 255.255.255.248 
+!
+interface GigabitEthernet0/1.900
+ vlan 900
+ nameif guest
+ security-level 10
+ ip address 10.225.250.52 255.255.255.248 
+!
+interface GigabitEthernet0/1.3001
+ vlan 3001
+ nameif backdoor
+ security-level 90
+ no ip address
+!
+interface Management0/0
+ description OOB Management
+ duplex full
+ management-only
+ nameif mgmt
+ security-level 100
+ ip address 172.16.30.145 255.255.255.0 
 !
 ftp mode passive
+same-security-traffic permit intra-interface
+object network admin-systems
+ subnet 10.225.1.0 255.255.255.0
+ description Inside Interface Network
+object network backdoor-pod-supernet
+ subnet 172.16.0.0 255.252.0.0
+ description Backdoor Supernet
+object network backdoor-temp
+ subnet 172.16.30.0 255.255.255.0
+ description Backdoor Interface Network
+object network dev-app
+ subnet 10.225.18.0 255.255.255.0
+ description Inside Interface Network
+object network dev-data
+ subnet 10.225.19.0 255.255.255.0
+ description Inside Interface Network
+object network dev-web
+ host 10.225.17.11
+ description dmz Interface Network
+object network public-ip-dev-web
+ host 10.225.64.102
+object network dmz-supernet
+ subnet 10.225.0.0 255.255.192.0
+ description Supernet for Networks Behind Interface dmz
+object network public-ip-internet-nat-dmz
+ host 10.225.64.2
+object network dmz-transit
+ subnet 10.225.250.32 255.255.255.248
+ description dmz Interface Network
+object network guest-supernet
+ subnet 10.225.233.0 255.255.255.0
+ description Supernet for Networks Behind Interface guest
+object network public-ip-internet-nat-guest
+ host 10.225.64.3
+object network guest-transit
+ subnet 10.225.250.48 255.255.255.248
+ description guest Interface Network
+object network hotspot
+ subnet 10.225.49.0 255.255.255.0
+ description guest Interface Network
+object network inside-supernet
+ subnet 10.225.0.0 255.255.192.0
+ description Supernet for Networks Behind Interface inside
+object network public-ip-internet-nat-inside
+ host 10.225.64.1
+object network mgmt
+ subnet 10.225.2.0 255.255.255.0
+ description Inside Interface Network
+object network network_anyconnect_pool
+ subnet 192.168.255.0 255.255.255.0
+ description Addresses for AnyConnect Clients
+object network network_oob_management
+ subnet 172.16.30.0 255.255.255.0
+ description Management Interface Network
+object network outside-admin-fw
+ subnet 10.225.250.8 255.255.255.248
+ description Outside Interface Network
+object network prod-app
+ subnet 10.225.10.0 255.255.255.0
+ description Inside Interface Network
+object network prod-data
+ subnet 10.225.11.0 255.255.255.0
+ description Inside Interface Network
+object network prod-web
+ host 10.225.9.11
+ description dmz Interface Network
+object network public-ip-prod-web
+ host 10.225.64.101
+object network trusted-transit
+ subnet 10.225.250.0 255.255.255.248
+ description Inside Interface Network
+object-group network backdoor_networks
+ network-object object backdoor-temp
+object-group network dmz_networks
+ network-object object dev-web
+ network-object object dmz-transit
+ network-object object prod-web
+object-group network guest_networks
+ network-object object guest-transit
+ network-object object hotspot
+object-group network inside_networks
+ network-object object admin-systems
+ network-object object dev-app
+ network-object object dev-data
+ network-object object mgmt
+ network-object object network_oob_management
+ network-object object prod-app
+ network-object object prod-data
+ network-object object trusted-transit
+object-group network outside_networks
+ network-object object outside-admin-fw
+object-group service ALLOWED-INBOUND-dev-web
+ service-object tcp destination eq https 
+ service-object tcp destination eq ssh 
+ service-object tcp destination eq www 
+object-group service ALLOWED-INBOUND-prod-web
+ service-object tcp destination eq https 
+ service-object tcp destination eq ssh 
+ service-object tcp destination eq www 
+object-group service INTERNET-ALLOWED
+ service-object tcp destination eq https 
+ service-object tcp destination eq ssh 
+ service-object tcp destination eq www 
+ service-object udp destination eq domain 
+access-list global_access remark Allow Ping
+access-list global_access extended permit icmp any4 any4 
+access-list AnyConnect-Split-ACL standard permit 10.225.0.0 255.255.192.0 
+access-list dmz_access_in remark INTERNET-ALLOWED: None log default
+access-list dmz_access_in extended permit object-group INTERNET-ALLOWED object-group dmz_networks any log default 
+access-list guest_access_in remark INTERNET-ALLOWED: None log default
+access-list guest_access_in extended permit object-group INTERNET-ALLOWED object-group guest_networks any log default 
+access-list inside_access_in remark INTERNET-ALLOWED: None log default
+access-list inside_access_in extended permit object-group INTERNET-ALLOWED object-group inside_networks any log default 
+access-list outside_access_in extended permit object-group ALLOWED-INBOUND-dev-web any object dev-web log disable 
+access-list outside_access_in extended permit object-group ALLOWED-INBOUND-prod-web any object prod-web log disable 
 pager lines 23
+mtu mgmt 1500
+mtu outside 1500
+mtu inside 1500
+mtu dmz 1500
+mtu backdoor 1500
+mtu guest 1500
 no failover
+no monitor-interface outside
+no monitor-interface inside
+no monitor-interface dmz
+no monitor-interface backdoor
+no monitor-interface guest
+no monitor-interface service-module 
 icmp unreachable rate-limit 1 burst-size 1
 no asdm history enable
 arp timeout 14400
 no arp permit-nonconnected
 arp rate-limit 8192
+nat (inside,outside) source static inside_networks inside_networks destination static outside_networks outside_networks no-proxy-arp
+nat (inside,backdoor) source dynamic inside_networks interface destination static backdoor-pod-supernet backdoor-pod-supernet
+nat (inside,outside) source static inside_networks inside_networks destination static network_anyconnect_pool network_anyconnect_pool no-proxy-arp route-lookup
+nat (inside,outside) source static backdoor-pod-supernet backdoor-pod-supernet destination static network_anyconnect_pool network_anyconnect_pool no-proxy-arp route-lookup
+nat (outside,backdoor) source dynamic network_anyconnect_pool interface destination static backdoor-pod-supernet backdoor-pod-supernet
+nat (dmz,outside) source static dmz_networks dmz_networks destination static outside_networks outside_networks no-proxy-arp
+nat (guest,outside) source static guest_networks guest_networks destination static outside_networks outside_networks no-proxy-arp
+!
+object network dev-web
+ nat (dmz,outside) static public-ip-dev-web dns no-proxy-arp
+object network dmz-supernet
+ nat (dmz,outside) dynamic public-ip-internet-nat-dmz
+object network guest-supernet
+ nat (guest,outside) dynamic public-ip-internet-nat-guest
+object network inside-supernet
+ nat (inside,outside) dynamic public-ip-internet-nat-inside
+object network network_anyconnect_pool
+ nat (outside,outside) dynamic interface
+object network prod-web
+ nat (dmz,outside) static public-ip-prod-web dns no-proxy-arp
+access-group outside_access_in in interface outside
+access-group inside_access_in in interface inside
+access-group dmz_access_in in interface dmz
+access-group guest_access_in in interface guest
+access-group global_access global
+router ospf 1
+ network 10.225.250.0 255.255.255.248 area 0
+ network 10.225.250.8 255.255.255.248 area 0
+ network 10.225.250.32 255.255.255.248 area 0
+ network 10.225.250.48 255.255.255.248 area 0
+ no nsf cisco helper
+ no capability lls
+ log-adj-changes
+!
+route mgmt 0.0.0.0 0.0.0.0 172.16.30.254 1
+route outside 10.225.64.0 255.255.240.0 10.225.250.10 1
+route backdoor 172.16.0.0 255.252.0.0 172.16.30.1 1
 timeout xlate 3:00:00
 timeout pat-xlate 0:00:30
 timeout conn 1:00:00 half-closed 0:10:00 udp 0:02:00 sctp 0:02:00 icmp 0:00:02
@@ -3099,7 +6931,13 @@ timeout floating-conn 0:00:00
 timeout conn-holddown 0:00:15
 timeout igp stale-route 0:01:10
 user-identity default-domain LOCAL
+aaa authentication ssh console LOCAL 
+aaa authentication telnet console LOCAL 
+aaa authorization exec LOCAL auto-enable
+aaa authorization http console LOCAL
 aaa authentication login-history
+http server enable
+http 0.0.0.0 0.0.0.0 mgmt
 no snmp-server location
 no snmp-server contact
 crypto ipsec security-association pmtu-aging infinite
@@ -3110,51 +6948,53 @@ crypto ca trustpool policy
  auto-import
 crypto ca certificate chain _SmartCallHome_ServerCA
  certificate ca 513fb9743870b73440418d30930699ff
-    30820538 30820420 a0030201 02021051 3fb97438 70b73440 418d3093 0699ff30
-    0d06092a 864886f7 0d01010b 05003081 ca310b30 09060355 04061302 55533117
-    30150603 55040a13 0e566572 69536967 6e2c2049 6e632e31 1f301d06 0355040b
-    13165665 72695369 676e2054 72757374 204e6574 776f726b 313a3038 06035504
-    0b133128 63292032 30303620 56657269 5369676e 2c20496e 632e202d 20466f72
-    20617574 686f7269 7a656420 75736520 6f6e6c79 31453043 06035504 03133c56
-    65726953 69676e20 436c6173 73203320 5075626c 69632050 72696d61 72792043
-    65727469 66696361 74696f6e 20417574 686f7269 7479202d 20473530 1e170d31
-    33313033 31303030 3030305a 170d3233 31303330 32333539 35395a30 7e310b30
-    09060355 04061302 5553311d 301b0603 55040a13 1453796d 616e7465 6320436f
-    72706f72 6174696f 6e311f30 1d060355 040b1316 53796d61 6e746563 20547275
-    7374204e 6574776f 726b312f 302d0603 55040313 2653796d 616e7465 6320436c
-    61737320 33205365 63757265 20536572 76657220 4341202d 20473430 82012230
-    0d06092a 864886f7 0d010101 05000382 010f0030 82010a02 82010100 b2d805ca
-    1c742db5 175639c5 4a520996 e84bd80c f1689f9a 422862c3 a530537e 5511825b
-    037a0d2f e17904c9 b4967719 81019459 f9bcf77a 9927822d b783dd5a 277fb203
-    7a9c5325 e9481f46 4fc89d29 f8be7956 f6f7fdd9 3a68da8b 4b823341 12c3c83c
-    ccd6967a 84211a22 04032717 8b1c6861 930f0e51 80331db4 b5ceeb7e d062acee
-    b37b0174 ef6935eb cad53da9 ee9798ca 8daa440e 25994a15 96a4ce6d 02541f2a
-    6a26e206 3a6348ac b44cd175 9350ff13 2fd6dae1 c618f59f c9255df3 003ade26
-    4db42909 cd0f3d23 6f164a81 16fbf283 10c3b8d6 d855323d f1bd0fbd 8c52954a
-    16977a52 2163752f 16f9c466 bef5b509 d8ff2700 cd447c6f 4b3fb0f7 02030100
-    01a38201 63308201 5f301206 03551d13 0101ff04 08300601 01ff0201 00303006
-    03551d1f 04293027 3025a023 a021861f 68747470 3a2f2f73 312e7379 6d63622e
-    636f6d2f 70636133 2d67352e 63726c30 0e060355 1d0f0101 ff040403 02010630
-    2f06082b 06010505 07010104 23302130 1f06082b 06010505 07300186 13687474
-    703a2f2f 73322e73 796d6362 2e636f6d 306b0603 551d2004 64306230 60060a60
-    86480186 f8450107 36305230 2606082b 06010505 07020116 1a687474 703a2f2f
-    7777772e 73796d61 7574682e 636f6d2f 63707330 2806082b 06010505 07020230
-    1c1a1a68 7474703a 2f2f7777 772e7379 6d617574 682e636f 6d2f7270 61302906
-    03551d11 04223020 a41e301c 311a3018 06035504 03131153 796d616e 74656350
-    4b492d31 2d353334 301d0603 551d0e04 1604145f 60cf6190 55df8443 148a602a
-    b2f57af4 4318ef30 1f060355 1d230418 30168014 7fd365a7 c2ddecbb f03009f3
-    4339fa02 af333133 300d0609 2a864886 f70d0101 0b050003 82010100 5e945649
-    dd8e2d65 f5c13651 b603e3da 9e7319f2 1f59ab58 7e6c2605 2cfa81d7 5c231722
-    2c3793f7 86ec85e6 b0a3fd1f e232a845 6fe1d9fb b9afd270 a0324265 bf84fe16
-    2a8f3fc5 a6d6a393 7d43e974 21913528 f463e92e edf7f55c 7f4b9ab5 20e90abd
-    e045100c 14949a5d a5e34b91 e8249b46 4065f422 72cd99f8 8811f5f3 7fe63382
-    e6a8c57e fed008e2 25580871 68e6cda2 e614de4e 52242dfd e5791353 e75e2f2d
-    4d1b6d40 15522bf7 87897812 816ed94d aa2d78d4 c22c3d08 5f87919e 1f0eb0de
-    30526486 89aa9d66 9c0e760c 80f274d8 2af8b83a ced7d60f 11be6bab 14f5bd41
+    30820538 30820420 a0030201 02021051 3fb97438 70b73440 418d3093 0699ff30 
+    0d06092a 864886f7 0d01010b 05003081 ca310b30 09060355 04061302 55533117 
+    30150603 55040a13 0e566572 69536967 6e2c2049 6e632e31 1f301d06 0355040b 
+    13165665 72695369 676e2054 72757374 204e6574 776f726b 313a3038 06035504 
+    0b133128 63292032 30303620 56657269 5369676e 2c20496e 632e202d 20466f72 
+    20617574 686f7269 7a656420 75736520 6f6e6c79 31453043 06035504 03133c56 
+    65726953 69676e20 436c6173 73203320 5075626c 69632050 72696d61 72792043 
+    65727469 66696361 74696f6e 20417574 686f7269 7479202d 20473530 1e170d31 
+    33313033 31303030 3030305a 170d3233 31303330 32333539 35395a30 7e310b30 
+    09060355 04061302 5553311d 301b0603 55040a13 1453796d 616e7465 6320436f 
+    72706f72 6174696f 6e311f30 1d060355 040b1316 53796d61 6e746563 20547275 
+    7374204e 6574776f 726b312f 302d0603 55040313 2653796d 616e7465 6320436c 
+    61737320 33205365 63757265 20536572 76657220 4341202d 20473430 82012230 
+    0d06092a 864886f7 0d010101 05000382 010f0030 82010a02 82010100 b2d805ca 
+    1c742db5 175639c5 4a520996 e84bd80c f1689f9a 422862c3 a530537e 5511825b 
+    037a0d2f e17904c9 b4967719 81019459 f9bcf77a 9927822d b783dd5a 277fb203 
+    7a9c5325 e9481f46 4fc89d29 f8be7956 f6f7fdd9 3a68da8b 4b823341 12c3c83c 
+    ccd6967a 84211a22 04032717 8b1c6861 930f0e51 80331db4 b5ceeb7e d062acee 
+    b37b0174 ef6935eb cad53da9 ee9798ca 8daa440e 25994a15 96a4ce6d 02541f2a 
+    6a26e206 3a6348ac b44cd175 9350ff13 2fd6dae1 c618f59f c9255df3 003ade26 
+    4db42909 cd0f3d23 6f164a81 16fbf283 10c3b8d6 d855323d f1bd0fbd 8c52954a 
+    16977a52 2163752f 16f9c466 bef5b509 d8ff2700 cd447c6f 4b3fb0f7 02030100 
+    01a38201 63308201 5f301206 03551d13 0101ff04 08300601 01ff0201 00303006 
+    03551d1f 04293027 3025a023 a021861f 68747470 3a2f2f73 312e7379 6d63622e 
+    636f6d2f 70636133 2d67352e 63726c30 0e060355 1d0f0101 ff040403 02010630 
+    2f06082b 06010505 07010104 23302130 1f06082b 06010505 07300186 13687474 
+    703a2f2f 73322e73 796d6362 2e636f6d 306b0603 551d2004 64306230 60060a60 
+    86480186 f8450107 36305230 2606082b 06010505 07020116 1a687474 703a2f2f 
+    7777772e 73796d61 7574682e 636f6d2f 63707330 2806082b 06010505 07020230 
+    1c1a1a68 7474703a 2f2f7777 772e7379 6d617574 682e636f 6d2f7270 61302906 
+    03551d11 04223020 a41e301c 311a3018 06035504 03131153 796d616e 74656350 
+    4b492d31 2d353334 301d0603 551d0e04 1604145f 60cf6190 55df8443 148a602a 
+    b2f57af4 4318ef30 1f060355 1d230418 30168014 7fd365a7 c2ddecbb f03009f3 
+    4339fa02 af333133 300d0609 2a864886 f70d0101 0b050003 82010100 5e945649 
+    dd8e2d65 f5c13651 b603e3da 9e7319f2 1f59ab58 7e6c2605 2cfa81d7 5c231722 
+    2c3793f7 86ec85e6 b0a3fd1f e232a845 6fe1d9fb b9afd270 a0324265 bf84fe16 
+    2a8f3fc5 a6d6a393 7d43e974 21913528 f463e92e edf7f55c 7f4b9ab5 20e90abd 
+    e045100c 14949a5d a5e34b91 e8249b46 4065f422 72cd99f8 8811f5f3 7fe63382 
+    e6a8c57e fed008e2 25580871 68e6cda2 e614de4e 52242dfd e5791353 e75e2f2d 
+    4d1b6d40 15522bf7 87897812 816ed94d aa2d78d4 c22c3d08 5f87919e 1f0eb0de 
+    30526486 89aa9d66 9c0e760c 80f274d8 2af8b83a ced7d60f 11be6bab 14f5bd41 
     a0226389 f1ba0f6f 2963662d 3fac8c72 c5fbc7e4 d40ff23b 4f8c29c7
   quit
+telnet 0.0.0.0 0.0.0.0 mgmt
 telnet timeout 5
 ssh stricthostkeycheck
+ssh 0.0.0.0 0.0.0.0 mgmt
 ssh timeout 5
 ssh version 2
 ssh key-exchange group dh-group14-sha1
@@ -3163,7 +7003,28 @@ console serial
 threat-detection basic-threat
 threat-detection statistics access-list
 no threat-detection statistics tcp-intercept
+webvpn
+ enable outside
+ anyconnect enable
+ tunnel-group-list enable
+ tunnel-group-preference group-url
+ cache
+  disable
+ error-recovery disable
+group-policy GroupPolicy_SSLClient internal
+group-policy GroupPolicy_SSLClient attributes
+ vpn-tunnel-protocol ikev2 ssl-client 
+ split-tunnel-policy tunnelspecified
+ split-tunnel-network-list value AnyConnect-Split-ACL
+ default-domain value None
 dynamic-access-policy-record DfltAccessPolicy
+username cisco password $sha512$5000$QGaihmWatWRn869GPkMzPQ==$6bZiRKDEkACgaTuJ4xveuw== pbkdf2 privilege 15
+tunnel-group SSLClient type remote-access
+tunnel-group SSLClient general-attributes
+ address-pool AnyConnect-Pool
+ default-group-policy GroupPolicy_SSLClient
+tunnel-group SSLClient webvpn-attributes
+ group-alias SSLClient enable
 !
 class-map inspection_default
  match default-inspection-traffic
@@ -3176,21 +7037,31 @@ policy-map type inspect dns preset_dns_map
   no tcp-inspection
 policy-map global_policy
  class inspection_default
-  inspect ip-options
-  inspect netbios
-  inspect rtsp
-  inspect sunrpc
-  inspect tftp
-  inspect xdmcp
-  inspect dns preset_dns_map
-  inspect ftp
-  inspect h323 h225
-  inspect h323 ras
-  inspect rsh
-  inspect esmtp
-  inspect sqlnet
-  inspect sip
-  inspect skinny
+  inspect ip-options 
+  inspect netbios 
+  inspect rtsp 
+  inspect sunrpc 
+  inspect tftp 
+  inspect xdmcp 
+  inspect dns preset_dns_map 
+  inspect ftp 
+  inspect h323 h225 
+  inspect h323 ras 
+  inspect rsh 
+  inspect esmtp 
+  inspect sqlnet 
+  inspect sip  
+  inspect skinny  
+policy-map type inspect dns migrated_dns_map_4
+ parameters
+  message-length maximum client auto
+  message-length maximum 512
+  no tcp-inspection
+policy-map type inspect dns migrated_dns_map_3
+ parameters
+  message-length maximum client auto
+  message-length maximum 512
+  no tcp-inspection
 policy-map type inspect dns migrated_dns_map_2
  parameters
   message-length maximum client auto
@@ -3203,11 +7074,8 @@ policy-map type inspect dns migrated_dns_map_1
   no tcp-inspection
 !
 service-policy global_policy global
-prompt hostname context
+prompt hostname context 
 call-home
- profile License
-  destination address http https://tools.cisco.com/its/service/oddce/services/DDCEService
-  destination transport-method http
  profile CiscoTAC-1
   no active
   destination address http https://tools.cisco.com/its/service/oddce/services/DDCEService
@@ -3218,6 +7086,9 @@ call-home
   subscribe-to-alert-group inventory periodic monthly
   subscribe-to-alert-group configuration periodic monthly
   subscribe-to-alert-group telemetry periodic daily
+ profile License
+  destination address http https://tools.cisco.com/its/service/oddce/services/DDCEService
+  destination transport-method http
 </entry>
         </extensions>
         <interface id="0" name="GigabitEthernet0/0"/>
