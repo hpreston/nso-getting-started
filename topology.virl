@@ -220,6 +220,7 @@ line vty 0 4
  login local
  transport input telnet ssh
 !
+crypto key generate rsa general-keys modulus 1024
 !
 end
 
@@ -485,6 +486,8 @@ call-home
  profile License
   destination address http https://tools.cisco.com/its/service/oddce/services/DDCEService
   destination transport-method http
+ !
+ crypto key generate rsa general-keys modulus 1024
 </entry>
             <entry key="AutoNetkit.ASN" type="Integer">1</entry>
         </extensions>
@@ -720,6 +723,8 @@ line vty 0 4
 !
 !
 !
+ip domain-name lab.devnetsandbox.intra
+crypto key generate rsa general-keys modulus 1024
 !
 !
 end
@@ -958,6 +963,9 @@ line vty 0 4
 !
 !
 !
+ip domain-name lab.devnetsandbox.intra
+crypto key generate rsa general-keys modulus 1024
+
 !
 !
 end
@@ -2631,6 +2639,8 @@ line vty 0 4
 !
 !
 !
+ip domain-name lab.devnetsandbox.intra
+crypto key generate rsa general-keys modulus 1024
 !
 !
 end
@@ -4814,6 +4824,7 @@ line vty 0 4
  login local
  transport input telnet ssh
 !
+crypto key generate rsa general-keys modulus 1024
 !
 end
 
@@ -6302,6 +6313,7 @@ line vty 0 4
  login local
  transport input telnet ssh
 !
+crypto key generate rsa general-keys modulus 1024
 !
 end
 
@@ -6475,6 +6487,7 @@ line vty 0 4
  login local
  transport input telnet ssh
 !
+crypto key generate rsa general-keys modulus 1024
 !
 end
 
@@ -6681,6 +6694,8 @@ call-home
  profile License
   destination address http https://tools.cisco.com/its/service/oddce/services/DDCEService
   destination transport-method http
+ !
+ crypto key generate rsa general-keys modulus 1024 
 </entry>
         </extensions>
         <interface id="0" name="GigabitEthernet0/0"/>
@@ -7089,6 +7104,8 @@ call-home
  profile License
   destination address http https://tools.cisco.com/its/service/oddce/services/DDCEService
   destination transport-method http
+ !
+ crypto key generate rsa general-keys modulus 1024 
 </entry>
         </extensions>
         <interface id="0" name="GigabitEthernet0/0"/>
