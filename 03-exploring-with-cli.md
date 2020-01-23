@@ -756,7 +756,7 @@ In this exercise we'll build a simple device template that can be used to config
 
     ```
     devices template SET-DNS-SERVER
-    ned-id cisco-ios-cli-6.40
+    ned-id cisco-ios-cli-6.42
     config
     ip name-server name-server-list 208.67.222.222
     ip name-server name-server-list 208.67.220.220

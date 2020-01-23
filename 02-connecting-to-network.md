@@ -257,7 +257,7 @@ As you learned during the installation step, a Local Install unpacks and prepare
     > You will want to use the name of the NED folder in `${NCS_DIR}/packages/neds` for the latest NED version you've got installed for the target platform.
 
     ```bash
-    ncs-setup --package cisco-ios-cli-6.40 \
+    ncs-setup --package cisco-ios-cli-6.42 \
     --package cisco-nx-cli-5.13 \
     --package cisco-asa-cli-6.7 \
     --dest .
@@ -357,14 +357,14 @@ With our authgroup setup, let's go ahead and add our devices to the inventory.  
     * Address: `172.16.30.135` 
     * Protocol: SSH
         * We will disable SSH host-key-verification (in production systems you can configure the host-key or just "fetch" to learn)
-    * NED: `cisco-ios-cli-6.40`
+    * NED: `cisco-ios-cli-6.42`
 1. Enter this configuration into NSO. 
 
     ```text
     devices device dmz-rtr01-1
     address 172.16.30.135
     authgroup labadmin
-    device-type cli ned-id cisco-ios-cli-6.40
+    device-type cli ned-id cisco-ios-cli-6.42
     device-type cli protocol ssh
     ssh host-key-verification none
     ```
@@ -448,26 +448,26 @@ With our authgroup setup, let's go ahead and add our devices to the inventory.  
     NAME             ADDRESS        DESCRIPTION  NED ID             ADMIN STATE  
     ---------------------------------------------------------------------------
     dmz-fw01-1       172.16.30.133  -            cisco-asa-cli-6.7  unlocked     
-    dmz-rtr01-1      172.16.30.135  -            cisco-ios-cli-6.40  unlocked     
-    dmz-rtr02-1      172.16.30.135  -            cisco-ios-cli-6.40  unlocked     
-    dmz-rtr02-2      172.16.30.136  -            cisco-ios-cli-6.40  unlocked     
+    dmz-rtr01-1      172.16.30.135  -            cisco-ios-cli-6.42  unlocked     
+    dmz-rtr02-1      172.16.30.135  -            cisco-ios-cli-6.42  unlocked     
+    dmz-rtr02-2      172.16.30.136  -            cisco-ios-cli-6.42  unlocked     
     dmz-sw01-1       172.16.30.107  -            cisco-nx-cli-5.13   unlocked     
     dmz-sw01-2       172.16.30.108  -            cisco-nx-cli-5.13   unlocked     
     dmz-sw02-1       172.16.30.109  -            cisco-nx-cli-5.13   unlocked     
     dmz-sw02-2       172.16.30.110  -            cisco-nx-cli-5.13   unlocked     
-    fw-inside-sw01   172.16.30.122  -            cisco-ios-cli-6.40  unlocked     
-    fw-outside-sw01  172.16.30.123  -            cisco-ios-cli-6.40  unlocked     
+    fw-inside-sw01   172.16.30.122  -            cisco-ios-cli-6.42  unlocked     
+    fw-outside-sw01  172.16.30.123  -            cisco-ios-cli-6.42  unlocked     
     fw01             172.16.30.145  -            cisco-asa-cli-6.7  unlocked     
     fw02             172.16.30.146  -            cisco-asa-cli-6.7  unlocked     
-    internet-rtr     172.16.30.171  -            cisco-ios-cli-6.40  unlocked     
+    internet-rtr     172.16.30.171  -            cisco-ios-cli-6.42  unlocked     
     leaf01-1         172.16.30.103  -            cisco-nx-cli-5.13   unlocked     
     leaf01-2         172.16.30.104  -            cisco-nx-cli-5.13   unlocked     
     leaf02-1         172.16.30.105  -            cisco-nx-cli-5.13   unlocked     
     leaf02-2         172.16.30.106  -            cisco-nx-cli-5.13   unlocked     
     spine01-1        172.16.30.101  -            cisco-nx-cli-5.13   unlocked     
     spine01-2        172.16.30.102  -            cisco-nx-cli-5.13   unlocked     
-    vm-sw01          172.16.30.121  -            cisco-ios-cli-6.40  unlocked     
-    vm-sw02          172.16.30.115  -            cisco-ios-cli-6.40  unlocked 
+    vm-sw01          172.16.30.121  -            cisco-ios-cli-6.42  unlocked     
+    vm-sw02          172.16.30.115  -            cisco-ios-cli-6.42  unlocked 
     ```
 
     </details>
@@ -609,7 +609,7 @@ Now NSO can successfully connect to the network, but it hasn't "learned" the cur
 
     </details>
 
-    > Checkout a few other devices.  Differnet NEDs have different "default states". 
+    > Checkout a few other devices.  Different NEDs have different "default states". 
 
 1. NSO makes it easy to `sync-from` the network devices to "learn" the current configuration.  Go ahead and do that to all devices.  
 

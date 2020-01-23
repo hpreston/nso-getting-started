@@ -26,7 +26,7 @@ This use case has two parts.
 
     ```
     devices template COMPLIANCE-CHECK
-    ned-id cisco-ios-cli-6.40
+    ned-id cisco-ios-cli-6.42
     config
 
     ip name-server name-server-list 208.67.222.222
@@ -90,7 +90,7 @@ This use case has two parts.
 
     ```
     devices template COMPLIANCE-CHECK
-     ned-id cisco-ios-cli-6.40
+     ned-id cisco-ios-cli-6.42
       config
        service timestamps log datetime localtime
        service timestamps log datetime show-timezone

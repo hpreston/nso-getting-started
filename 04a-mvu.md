@@ -20,7 +20,7 @@ Our goal is to update the SNMP community string configuration on all our network
 
     ```
     devices template UPDATE-SNMP-COMMUNITY
-    ned-id cisco-ios-cli-6.40
+    ned-id cisco-ios-cli-6.42
     config
     snmp-server community {$READ_ONLY_COMMUNITY} RO
     snmp-server community {$READ_WRITE_COMMUNITY} RW
@@ -293,7 +293,7 @@ In these cases, you can tell NSO to take one of the following alternative action
 
     ```
     devices template UPDATE-SNMP-COMMUNITY
-     ned-id cisco-ios-cli-6.40
+     ned-id cisco-ios-cli-6.42
       config
        snmp-server community {$READ_ONLY_COMMUNITY}
          RO
@@ -333,7 +333,7 @@ In these cases, you can tell NSO to take one of the following alternative action
     <template>
         <name>UPDATE-SNMP-COMMUNITY</name>
         <ned-id>
-        <id xmlns:cisco-ios-cli-6.40="http://tail-f.com/ns/ned-id/cisco-ios-cli-6.40">cisco-ios-cli-6.40:cisco-ios-cli-6.40</id>
+        <id xmlns:cisco-ios-cli-6.42="http://tail-f.com/ns/ned-id/cisco-ios-cli-6.42">cisco-ios-cli-6.42:cisco-ios-cli-6.42</id>
         <config>
             <snmp-server xmlns="urn:ios">
             <community>
@@ -406,7 +406,7 @@ In these cases, you can tell NSO to take one of the following alternative action
 
     ```
     devices template UPDATE-SNMP-COMMUNITY
-    ned-id cisco-ios-cli-6.40 
+    ned-id cisco-ios-cli-6.42 
     config
     tag add snmp-server replace
 
@@ -432,13 +432,13 @@ In these cases, you can tell NSO to take one of the following alternative action
 
     ```
     devices template UPDATE-SNMP-COMMUNITY
-     ned-id cisco-ios-cli-6.40
+     ned-id cisco-ios-cli-6.42
       config
-       ! Tags: replace (/devices/template{UPDATE-SNMP-COMMUNITY}/ned-id{cisco-ios-cli-6.40:cisco-ios-cli-6.40}/config/ios:snmp-server)
+       ! Tags: replace (/devices/template{UPDATE-SNMP-COMMUNITY}/ned-id{cisco-ios-cli-6.42:cisco-ios-cli-6.42}/config/ios:snmp-server)
        snmp-server community {$READ_ONLY_COMMUNITY}
          RO
        !
-       ! Tags: replace (/devices/template{UPDATE-SNMP-COMMUNITY}/ned-id{cisco-ios-cli-6.40:cisco-ios-cli-6.40}/config/ios:snmp-server)
+       ! Tags: replace (/devices/template{UPDATE-SNMP-COMMUNITY}/ned-id{cisco-ios-cli-6.42:cisco-ios-cli-6.42}/config/ios:snmp-server)
        snmp-server community {$READ_WRITE_COMMUNITY}
          RW
        !
@@ -482,7 +482,7 @@ In these cases, you can tell NSO to take one of the following alternative action
     <template>
         <name>UPDATE-SNMP-COMMUNITY</name>
         <ned-id>
-        <id xmlns:cisco-ios-cli-6.40="http://tail-f.com/ns/ned-id/cisco-ios-cli-6.40">cisco-ios-cli-6.40:cisco-ios-cli-6.40</id>
+        <id xmlns:cisco-ios-cli-6.42="http://tail-f.com/ns/ned-id/cisco-ios-cli-6.42">cisco-ios-cli-6.42:cisco-ios-cli-6.42</id>
         <config>
             <snmp-server xmlns="urn:ios" tags=" replace ">  <!-- Notice TAG -->
             <community>

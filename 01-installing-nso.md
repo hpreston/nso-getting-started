@@ -224,7 +224,7 @@ Here you can see there are NEDs for Cisco ASA, IOS, IOS XR, and NX-OS.  Also inc
 > Note: The NEDs included in the installer are intended for evaluation, demonstration, and used with the included `examples.ncs` that are also included.  These are not the latest versions available, and often don't have all the features available in production NEDs. 
 
 #### Installing New NED Versions 
-Cisco also makes additional versions of some NEDs available on DevNet for evaulation and non-production use.  You can find them [here]().  
+Cisco also makes additional versions of some NEDs available on DevNet for evaluation and non-production use.  You can find them with the NSO downloads [here](https://developer.cisco.com/docs/nso/#!getting-nso).  
 
 For this getting started lab we'll be leveraging Cisco IOS, NX-OS and ASA devices.  Go ahead and download the updated NEDs from DevNet and we'll install them now!  
 
@@ -240,7 +240,7 @@ For this getting started lab we'll be leveraging Cisco IOS, NX-OS and ASA device
 
     # Output 
     -rw-r--r--@ 1 hapresto  staff   9708091 Dec 18 12:05 ncs-5.3-cisco-asa-6.7.7.signed.bin
-    -rw-r--r--@ 1 hapresto  staff  51233042 Dec 18 12:06 ncs-5.3-cisco-ios-6.40.1.signed.bin
+    -rw-r--r--@ 1 hapresto  staff  51233042 Dec 18 12:06 ncs-5.3-cisco-ios-6.42.1.signed.bin
     -rw-r--r--@ 1 hapresto  staff   8400190 Dec 18 12:05 ncs-5.3-cisco-nx-5.13.1.1.signed.bin
     ```
 
@@ -255,7 +255,7 @@ For this getting started lab we'll be leveraging Cisco IOS, NX-OS and ASA device
 
     ```bash
     -rwxr-xr-x@ 1 hapresto  staff   9708091 Dec 18 12:05 ncs-5.3-cisco-asa-6.7.7.signed.bin
-    -rwxr-xr-x@ 1 hapresto  staff  51233042 Dec 18 12:06 ncs-5.3-cisco-ios-6.40.1.signed.bin
+    -rwxr-xr-x@ 1 hapresto  staff  51233042 Dec 18 12:06 ncs-5.3-cisco-ios-6.42.1.signed.bin
     -rwxr-xr-x@ 1 hapresto  staff   8400190 Dec 18 12:05 ncs-5.3-cisco-nx-5.13.1.1.signed.bin
     ```
 
@@ -295,7 +295,7 @@ For this getting started lab we'll be leveraging Cisco IOS, NX-OS and ASA device
 
     ```bash
     -rw-r--r--  1 hapresto  staff   9704896 Dec 12 21:11 ncs-5.3-cisco-asa-6.7.7.tar.gz
-    -rw-r--r--  1 hapresto  staff  51260488 Dec 13 22:58 ncs-5.3-cisco-ios-6.40.1.tar.gz
+    -rw-r--r--  1 hapresto  staff  51260488 Dec 13 22:58 ncs-5.3-cisco-ios-6.42.1.tar.gz
     -rw-r--r--  1 hapresto  staff   8409288 Dec 18 09:09 ncs-5.3-cisco-nx-5.13.1.1.tar.gz
     ```
 
@@ -313,7 +313,7 @@ For this getting started lab we'll be leveraging Cisco IOS, NX-OS and ASA device
 
     ```bash
     tar -zxvf ~/Downloads/ncs-5.3-cisco-nx-5.13.1.1.tar.gz
-    tar -zxvf ~/Downloads/ncs-5.3-cisco-ios-6.40.1.tar.gz
+    tar -zxvf ~/Downloads/ncs-5.3-cisco-ios-6.42.1.tar.gz
     tar -zxvf ~/Downloads/ncs-5.3-cisco-asa-6.7.7.tar.gz
 
     ls -l
@@ -328,7 +328,7 @@ For this getting started lab we'll be leveraging Cisco IOS, NX-OS and ASA device
     drwxr-xr-x  13 hapresto  staff   416 Dec 12 21:11 cisco-asa-cli-6.7
     drwxr-xr-x  12 hapresto  staff   384 Nov 29 05:17 cisco-ios-cli-3.0
     drwxr-xr-x  12 hapresto  staff   384 Nov 29 05:17 cisco-ios-cli-3.8
-    drwxr-xr-x  13 hapresto  staff   416 Dec 13 22:58 cisco-ios-cli-6.40
+    drwxr-xr-x  13 hapresto  staff   416 Dec 13 22:58 cisco-ios-cli-6.42
     drwxr-xr-x  13 hapresto  staff   416 Nov 29 05:17 cisco-iosxr-cli-3.0
     drwxr-xr-x  13 hapresto  staff   416 Nov 29 05:17 cisco-iosxr-cli-3.5
     drwxr-xr-x  13 hapresto  staff   416 Nov 29 05:17 cisco-nx-cli-3.0
